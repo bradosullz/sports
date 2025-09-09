@@ -1,0 +1,72 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+h1 {
+    color: #0d47a1; /* NFL blue */
+}
+
+table {
+    width: 80%;
+    max-width: 900px;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+thead tr {
+    background-color: #0d47a1; /* NFL blue */
+    color: #ffffff;
+}
+
+th {
+    cursor: pointer;
+    position: relative;
+    user-select: none; /* Prevent text selection on click */
+}
+
+/* Arrows for sorting indication */
+th::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 5px;
+    height: 5px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    opacity: 0.3;
+}
+
+th[data-sort-dir="asc"]::after {
+    transform: translateY(-25%) rotate(-135deg);
+    opacity: 1;
+}
+
+th[data-sort-dir="desc"]::after {
+    transform: translateY(-75%) rotate(45deg);
+    opacity: 1;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #e9eff5;
+}
