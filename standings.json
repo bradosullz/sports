@@ -1,0 +1,50 @@
+[
+    {
+        "Player": "AK",
+        "Expected Points": 1523,
+        "Most Likely Points": 1317,
+        "Maximum Points": 4450
+    },
+    {
+        "Player": "BW",
+        "Expected Points": 1632,
+        "Most Likely Points": 2008,
+        "Maximum Points": 2173
+    },
+    {
+        "Player": "BS",
+        "Expected Points": 1622,
+        "Most Likely Points": 1992,
+        "Maximum Points": 2417
+    },
+    {
+        "Player": "CL",
+        "Expected Points": 1648,
+        "Most Likely Points": 1630,
+        "Maximum Points": 2679
+    },
+    {
+        "Player": "KK",
+        "Expected Points": 1600,
+        "Most Likely Points": 1947,
+        "Maximum Points": 2226
+    },
+    {
+        "Player": "MG",
+        "Expected Points": 1571,
+        "Most Likely Points": 1747,
+        "Maximum Points": 3023
+    },
+    {
+        "Player": "PM",
+        "Expected Points": 1553,
+        "Most Likely Points": 1547,
+        "Maximum Points": 4136
+    },
+    {
+        "Player": "WM",
+        "Expected Points": 1633,
+        "Most Likely Points": 2037,
+        "Maximum Points": 2507
+    }
+]
