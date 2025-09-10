@@ -1,35 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Function to fetch and display data from the JSON file
-    const populateTable = async () => {
-        try {
-            const response = await fetch('standings.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-            
-            const tableBody = document.querySelector('#standingsTable tbody');
-            tableBody.innerHTML = ''; // Clear existing table rows
-
-            data.forEach(player => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${player.Player}</td>
-                    <td>${player['Expected Points']}</td>
-                    <td>${player['Most Likely Points']}</td>
-                    <td>${player['Maximum Points']}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error fetching or populating data:', error);
-        }
-    };
-    
-    populateTable();
-    
-           
+               
     /**
      * Sorts an HTML table.
      * @param {HTMLTableElement} table The table to sort
