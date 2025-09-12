@@ -61,4 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const defaultDirection = defaultSortHeader.dataset.sortDir;
         sortTableByColumn(table, defaultColumnIndex, defaultDirection);
     }
+    
+        // Make all rows in all tables selectable and highlight on click
+        document.querySelectorAll('table').forEach(function(table) {
+            table.querySelectorAll('tbody tr').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    table.querySelectorAll('tbody tr').forEach(function(r) {
+                        r.classList.remove('selected-row');
+                    });
+                    row.classList.add('selected-row');
+
+                        // If this is the standings table, show selected player below
+                        if (table.id === 'standingsTable') {
+                            var playerName = row.querySelector('td').textContent;
+                            var playerTable = document.getElementById('selectedPlayerTable');
+                            var playerNameCell = document.getElementById('selectedPlayerName');
+                            playerNameCell.textContent = "Testing Tacos!"; //playerName;
+                            playerTable.style.display = '';
+                        }
+                });
+            });
+        });
 });

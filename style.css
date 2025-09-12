@@ -8,6 +8,10 @@ body {
     margin: 20px;
 }
 
+.selected-row {
+    background-color: #ffe082 !important;
+}
+
 h1 {
     color: #0d47a1; /* NFL blue */
 }
@@ -20,6 +24,7 @@ table {
     background-color: #ffffff;
     border-radius: 8px;
     overflow: hidden;
+    margin-bottom: 32px; /* Add space below tables */
 }
 
 th, td {
