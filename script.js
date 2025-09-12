@@ -21,24 +21,32 @@ document.addEventListener('DOMContentLoaded', async () => {
      * @param {Array} allTeamData The full array of team data from the JSON file.
      */
     const populatePlayerPicks = (playerName, allTeamData) => {
-        const playerTable = document.getElementById('selectedPlayerTable');
-        const tableBody = playerTable.querySelector('tbody');
-        const playerNameHeader = document.getElementById('selectedPlayerName');
+        const playerTableMakes = document.getElementById('selectedPlayerTableMakes');
+        const playerTableMisses = document.getElementById('selectedPlayerTableMisses');
+        const tableBodyMakes = playerTableMakes.querySelector('tbody');
+        const tableBodyMisses = playerTableMisses.querySelector('tbody');
+        const playerNameHeaderMakes = document.getElementById('selectedPlayerNameMakes');
+        const playerNameHeaderMisses = document.getElementById('selectedPlayerNameMisses');
 
         // Clear any previous data from the table body
-        tableBody.innerHTML = '';
+        tableBodyMakes.innerHTML = '';
+        tableBodyMisses.innerHTML = '';
 
         // Update the table's main header with the selected player's name
-        playerNameHeader.textContent = `${playerName}'s "Make Playoffs" Picks`;
+        playerNameHeaderMakes.textContent = `${playerName}'s "Make Playoffs" Picks`;
+        playerNameHeaderMisses.textContent = `${playerName}'s "Miss Playoffs" Picks`;
 
         // Filter the data to find only the teams this player picked
-        const playerPicks = allTeamData.filter(team =>
+        const playerPicksMakes = allTeamData.filter(team =>
             team.players_list_make_playoffs && team.players_list_make_playoffs.includes(playerName)
         );
+        const playerPicksMisses = allTeamData.filter(team =>
+            team.players_list_miss_playoffs && team.players_list_miss_playoffs.includes(playerName)
+        );
 
-        // Create and append a table row for each of the player's picks
-        playerPicks.forEach(team => {
-            const row = tableBody.insertRow();
+        // Create and append a table row for each of the player's Make Playoffs picks
+        playerPicksMakes.forEach(team => {
+            const row = tableBodyMakes.insertRow();
 
             // 1. Team Column
             const cellTeam = row.insertCell();
@@ -55,8 +63,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             cellProbability.textContent = `${probabilityPercent}%`;
         });
 
+        // Create and append a table row for each of the player's Miss Playoffs picks
+        playerPicksMisses.forEach(team => {
+            const row = tableBodyMisses.insertRow();
+
+            // 1. Team Column
+            const cellTeam = row.insertCell();
+            cellTeam.textContent = team.Team;
+
+            // 2. Points Column
+            const cellPoints = row.insertCell();
+            cellPoints.textContent = team.points_no_playoffs;
+
+            // 3. Playoff Probability Column
+            const cellProbability = row.insertCell();
+            // Format the number as a percentage with 2 decimal places
+            const probabilityPercent = ((1 - team.probability_playofffs) * 100).toFixed(2);
+            cellProbability.textContent = `${probabilityPercent}%`;
+        });
+
         // Make the table visible
-        playerTable.style.display = 'table';
+        playerTableMakes.style.display = 'table';
+        playerTableMisses.style.display = 'table';
     };
 
     /**
