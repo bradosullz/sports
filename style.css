@@ -13,7 +13,8 @@ body {
 }
 
 h1 {
-    color: #0d47a1; /* NFL blue */
+/*   color: #0d47a1; /* NFL blue */
+    color: #a10d9a; /* test */
 }
 
 table {
