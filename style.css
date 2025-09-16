@@ -14,7 +14,7 @@ body {
 
 h1 {
 /*   color: #0d47a1; /* NFL blue */
-    color: #a10d9a; /* test */
+    color: #39b812; /* test */
 }
 
 table {
@@ -71,17 +71,18 @@ th {
     cursor: pointer;
     position: relative;
     user-select: none; /* Prevent text selection on click */
+    padding-right: 28px; /* Add space for sort arrow */
 }
 
 /* Arrows for sorting indication */
 th::after {
     content: '';
     position: absolute;
-    right: 15px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%) rotate(45deg);
-    width: 5px;
-    height: 5px;
+    width: 7px;
+    height: 7px;
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
     opacity: 0.3;
