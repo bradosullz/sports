@@ -25,12 +25,39 @@ table {
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 32px; /* Add space below tables */
+    font-size: 14px;
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+@media (max-width: 600px) {
+    table {
+        width: 100%;
+        font-size: 12px;
+        margin-bottom: 20px;
+        box-shadow: none;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    th, td {
+        padding: 7px 4px;
+        font-size: 11px;
+    }
+    thead tr {
+        font-size: 12px;
+    }
+    body {
+        margin: 5px;
+    }
+    .container, .table-container {
+        width: 100%;
+        padding: 0;
+    }
 }
 
 thead tr {
@@ -58,35 +85,6 @@ th::after {
     opacity: 0.3;
 }
 
-/* Responsive table styles for mobile */
-@media (max-width: 600px) {
-    table {
-        width: 100%;
-        font-size: 14px;
-        margin-bottom: 20px;
-        box-shadow: none;
-    }
-    th, td {
-        padding: 8px 6px;
-        font-size: 13px;
-    }
-    thead tr {
-        font-size: 14px;
-    }
-    body {
-        margin: 5px;
-    }
-    .container, .table-container {
-        width: 100%;
-        padding: 0;
-    }
-    /* Enable horizontal scroll for wide tables */
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-}
 
 th[data-sort-dir="asc"]::after {
     transform: translateY(-25%) rotate(-135deg);
