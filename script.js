@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
     let teamData = [];
+    let probabilityData = [];
+    const playerMap = new Map();
 
     // Fetches team data from the specified URL when the page loads.
     try {
@@ -15,6 +17,152 @@ document.addEventListener('DOMContentLoaded', async () => {
         return; // Stop script execution if data isn't loaded
     }
 
+    // Updates probability data from ESPN from the specified URL the page loads.
+    try {
+        const response = await fetch('https://site.web.api.espn.com/apis/fitt/v3/sports/football/nfl/powerindex?region=us&lang=en');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        probabilityData = await response.json();
+    } catch (error) {
+        console.error("Could not fetch probability data:", error);
+        // Optionally, display an error message to the user on the page
+        return; // Stop script execution if data isn't loaded
+    }
+
+    // Merge probability data into teamData based on team names
+
+    const probabilityMap = {};
+    probabilityData.teams.forEach(teamD => {
+        probabilityMap[teamD.team.displayName] = teamD.categories[1].values[5] / 100; // Convert percentage to decimal
+    });
+
+    teamData.forEach(team => {
+        if (probabilityMap.hasOwnProperty(team.Team)) {
+            team.probability_playoffs = probabilityMap[team.Team];
+        } else {
+            team.probability_playoffs = 0; // Default value if not found
+        }
+    });
+
+    console.log("Merged Team Data:", teamData);
+
+    /**
+     * Calculate standings table
+     */
+
+    // Helper function to initialize a player if they don't exist in the map
+    const initializePlayer = (player) => {
+    if (!playerMap.has(player)) {
+        playerMap.set(player, {
+        player: player,
+        expectedPoints: 0,
+        mostLikelyPoints: 0,
+        maxPoints: 0
+        });
+    }
+    };
+
+    // Iterate over each team to calculate points
+    teamData.forEach(team => {
+    const {
+        probability_playoffs,
+        points_playoffs,
+        points_no_playoffs,
+        players_list_make_playoffs,
+        players_list_miss_playoffs
+    } = team;
+
+    // Process players who get points if the team makes the playoffs
+    if (players_list_make_playoffs) {
+        players_list_make_playoffs.forEach(player => {
+        initializePlayer(player);
+        const playerData = playerMap.get(player);
+
+        // Calculate expectedPoints
+        playerData.expectedPoints += points_playoffs * probability_playoffs;
+
+        // Calculate mostLikelyPoints
+        if (probability_playoffs >= 0.5) {
+            playerData.mostLikelyPoints += points_playoffs;
+        }
+
+        // Calculate maxPoints
+        if (probability_playoffs > 0) {
+            playerData.maxPoints += points_playoffs;
+        }
+        });
+    }
+
+    // Process players who get points if the team misses the playoffs
+    if (players_list_miss_playoffs) {
+        players_list_miss_playoffs.forEach(player => {
+        initializePlayer(player);
+        const playerData = playerMap.get(player);
+        const prob_miss_playoffs = 1 - probability_playoffs;
+
+        // Calculate expectedPoints
+        playerData.expectedPoints += points_no_playoffs * prob_miss_playoffs;
+
+        // Calculate mostLikelyPoints
+        if (probability_playoffs < 0.5) {
+            playerData.mostLikelyPoints += points_no_playoffs;
+        }
+
+        // Calculate maxPoints
+        if (probability_playoffs < 1) {
+            playerData.maxPoints += points_no_playoffs;
+        }
+        });
+    }
+    });
+
+    // Populate the standings table with the calculated player data
+    populateStandingsTable(playerMap);
+    
+    /**
+     * Populates the standings table with data from a Map.
+     * @param {Map<string, Object>} playerMap - The map containing player data.
+     */
+    function populateStandingsTable(playerMap) {
+        // Get the table body element
+        const tableBody = document.querySelector("#standingsTable tbody");
+
+        // Clear any existing rows
+        tableBody.innerHTML = '';
+
+        // Loop through each player object in the map's values
+        for (const playerData of playerMap.values()) {
+            // Create a new table row
+            const row = document.createElement("tr");
+
+            // Create and append the Player cell
+            const playerCell = document.createElement("td");
+            playerCell.textContent = playerData.player;
+            row.appendChild(playerCell);
+
+            // Create and append the Expected Points cell
+            const expectedPointsCell = document.createElement("td");
+            // Format to 2 decimal places for readability
+            expectedPointsCell.textContent = playerData.expectedPoints.toFixed(0);
+            row.appendChild(expectedPointsCell);
+
+            // Create and append the Most Likely Points cell
+            const mostLikelyPointsCell = document.createElement("td");
+            mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
+            row.appendChild(mostLikelyPointsCell);
+
+            // Create and append the Maximum Points cell
+            const maxPointsCell = document.createElement("td");
+            maxPointsCell.textContent = playerData.maxPoints;
+            row.appendChild(maxPointsCell);
+
+            // Append the completed row to the table body
+            tableBody.appendChild(row);
+        }
+    }
+    
+    
     /**
      * Populates the selected player's table with teams they picked to make the playoffs.
      * @param {string} playerName The name of the selected player (e.g., "AK").
@@ -59,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 3. Playoff Probability Column
             const cellProbability = row.insertCell();
             // Format the number as a percentage with 2 decimal places
-            const probabilityPercent = (team.probability_playofffs * 100).toFixed(2);
+            const probabilityPercent = (team.probability_playoffs * 100).toFixed(1);
             cellProbability.textContent = `${probabilityPercent}%`;
         });
 
@@ -78,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 3. Playoff Probability Column
             const cellProbability = row.insertCell();
             // Format the number as a percentage with 2 decimal places
-            const probabilityPercent = ((1 - team.probability_playofffs) * 100).toFixed(2);
+            const probabilityPercent = ((1 - team.probability_playoffs) * 100).toFixed(1);
             cellProbability.textContent = `${probabilityPercent}%`;
         });
 

@@ -1,7 +1,7 @@
 [
   {
     "Team":"Buffalo Bills",
-    "probability_playofffs":0.9226638024,
+  "probability_playoffs":0,
     "points_playoffs":116,
     "points_no_playoffs":734,
     "players_list_make_playoffs":[
@@ -15,7 +15,7 @@
   },
   {
     "Team":"Baltimore Ravens",
-    "probability_playofffs":0.8079710145,
+  "probability_playoffs":0,
     "points_playoffs":122,
     "points_no_playoffs":559,
     "players_list_make_playoffs":[
@@ -30,7 +30,7 @@
   },
   {
     "Team":"Kansas City Chiefs",
-    "probability_playofffs":0.6724285105,
+  "probability_playoffs":0,
     "points_playoffs":131,
     "points_no_playoffs":425,
     "players_list_make_playoffs":[
@@ -44,7 +44,7 @@
   },
   {
     "Team":"Philadelphia Eagles",
-    "probability_playofffs":0.7928118393,
+  "probability_playoffs":0,
     "points_playoffs":132,
     "points_no_playoffs":408,
     "players_list_make_playoffs":[
@@ -58,7 +58,7 @@
   },
   {
     "Team":"San Francisco 49ers",
-    "probability_playofffs":0.6759210938,
+  "probability_playoffs":0,
     "points_playoffs":156,
     "points_no_playoffs":279,
     "players_list_make_playoffs":[
@@ -74,7 +74,7 @@
   },
   {
     "Team":"Detroit Lions",
-    "probability_playofffs":0.4752252252,
+  "probability_playoffs":0,
     "points_playoffs":165,
     "points_no_playoffs":253,
     "players_list_make_playoffs":[
@@ -86,7 +86,7 @@
   },
   {
     "Team":"Tampa Bay Buccaneers",
-    "probability_playofffs":0.6893576222,
+  "probability_playoffs":0,
     "points_playoffs":169,
     "points_no_playoffs":244,
     "players_list_make_playoffs":[
@@ -99,7 +99,7 @@
   },
   {
     "Team":"Houston Texans",
-    "probability_playofffs":0.4842597589,
+  "probability_playoffs":0,
     "points_playoffs":175,
     "points_no_playoffs":233,
     "players_list_make_playoffs":null,
@@ -107,7 +107,7 @@
   },
   {
     "Team":"Los Angeles Rams",
-    "probability_playofffs":0.6319167296,
+  "probability_playoffs":0,
     "points_playoffs":175,
     "points_no_playoffs":233,
     "players_list_make_playoffs":null,
@@ -119,7 +119,7 @@
   },
   {
     "Team":"Cincinnati Bengals",
-    "probability_playofffs":0.5969308469,
+  "probability_playoffs":0,
     "points_playoffs":177,
     "points_no_playoffs":230,
     "players_list_make_playoffs":[
@@ -132,7 +132,7 @@
   },
   {
     "Team":"Green Bay Packers",
-    "probability_playofffs":0.7717948718,
+  "probability_playoffs":0,
     "points_playoffs":180,
     "points_no_playoffs":224,
     "players_list_make_playoffs":[
@@ -147,7 +147,7 @@
   },
   {
     "Team":"Denver Broncos",
-    "probability_playofffs":0.5619069483,
+  "probability_playoffs":0,
     "points_playoffs":185,
     "points_no_playoffs":217,
     "players_list_make_playoffs":[
@@ -159,7 +159,7 @@
   },
   {
     "Team":"Washington Commanders",
-    "probability_playofffs":0.5678092399,
+  "probability_playoffs":0,
     "points_playoffs":187,
     "points_no_playoffs":215,
     "players_list_make_playoffs":[
@@ -172,7 +172,7 @@
   },
   {
     "Team":"Los Angeles Chargers",
-    "probability_playofffs":0.6319167296,
+  "probability_playoffs":0,
     "points_playoffs":192,
     "points_no_playoffs":208,
     "players_list_make_playoffs":[
@@ -184,7 +184,7 @@
   },
   {
     "Team":"Minnesota Vikings",
-    "probability_playofffs":0.5022893773,
+  "probability_playoffs":0,
     "points_playoffs":210,
     "points_no_playoffs":191,
     "players_list_make_playoffs":null,
@@ -194,7 +194,7 @@
   },
   {
     "Team":"Arizona Cardinals",
-    "probability_playofffs":0.4601097509,
+  "probability_playoffs":0,
     "points_playoffs":235,
     "points_no_playoffs":174,
     "players_list_make_playoffs":null,
@@ -206,7 +206,7 @@
   },
   {
     "Team":"Pittsburgh Steelers",
-    "probability_playofffs":0.4402564301,
+  "probability_playoffs":0,
     "points_playoffs":242,
     "points_no_playoffs":170,
     "players_list_make_playoffs":[
@@ -219,7 +219,7 @@
   },
   {
     "Team":"Atlanta Falcons",
-    "probability_playofffs":0.3194726166,
+  "probability_playoffs":0,
     "points_playoffs":260,
     "points_no_playoffs":163,
     "players_list_make_playoffs":[
@@ -232,7 +232,7 @@
   },
   {
     "Team":"New England Patriots",
-    "probability_playofffs":0.269010043,
+  "probability_playoffs":0,
     "points_playoffs":279,
     "points_no_playoffs":156,
     "players_list_make_playoffs":[
@@ -246,7 +246,7 @@
   },
   {
     "Team":"Seattle Seahawks",
-    "probability_playofffs":0.269010043,
+  "probability_playoffs":0,
     "points_playoffs":283,
     "points_no_playoffs":155,
     "players_list_make_playoffs":[
@@ -258,7 +258,7 @@
   },
   {
     "Team":"Jacksonville Jaguars",
-    "probability_playofffs":0.4459330902,
+  "probability_playoffs":0,
     "points_playoffs":292,
     "points_no_playoffs":152,
     "players_list_make_playoffs":null,
@@ -271,7 +271,7 @@
   },
   {
     "Team":"Chicago Bears",
-    "probability_playofffs":0.2312979117,
+  "probability_playoffs":0,
     "points_playoffs":305,
     "points_no_playoffs":149,
     "players_list_make_playoffs":null,
@@ -282,7 +282,7 @@
   },
   {
     "Team":"Dallas Cowboys",
-    "probability_playofffs":0.2312979117,
+  "probability_playoffs":0,
     "points_playoffs":309,
     "points_no_playoffs":148,
     "players_list_make_playoffs":null,
@@ -296,7 +296,7 @@
   },
   {
     "Team":"Indianapolis Colts",
-    "probability_playofffs":0.3877709905,
+  "probability_playoffs":0,
     "points_playoffs":322,
     "points_no_playoffs":145,
     "players_list_make_playoffs":[
@@ -313,7 +313,7 @@
   },
   {
     "Team":"Miami Dolphins",
-    "probability_playofffs":0.18702814,
+  "probability_playoffs":0,
     "points_playoffs":347,
     "points_no_playoffs":140,
     "players_list_make_playoffs":null,
@@ -330,7 +330,7 @@
   },
   {
     "Team":"Carolina Panthers",
-    "probability_playofffs":0.2181050657,
+  "probability_playoffs":0,
     "points_playoffs":384,
     "points_no_playoffs":135,
     "players_list_make_playoffs":null,
@@ -342,7 +342,7 @@
   },
   {
     "Team":"Las Vegas Raiders",
-    "probability_playofffs":0.2820512821,
+  "probability_playoffs":0,
     "points_playoffs":483,
     "points_no_playoffs":126,
     "players_list_make_playoffs":null,
@@ -354,7 +354,7 @@
   },
   {
     "Team":"Tennessee Titans",
-    "probability_playofffs":0.1362007168,
+  "probability_playoffs":0,
     "points_playoffs":559,
     "points_no_playoffs":122,
     "players_list_make_playoffs":[
@@ -371,7 +371,7 @@
   },
   {
     "Team":"New York Jets",
-    "probability_playofffs":0.1025641026,
+  "probability_playoffs":0,
     "points_playoffs":697,
     "points_no_playoffs":117,
     "players_list_make_playoffs":[
@@ -387,7 +387,7 @@
   },
   {
     "Team":"New York Giants",
-    "probability_playofffs":0.0773361976,
+  "probability_playoffs":0,
     "points_playoffs":975,
     "points_no_playoffs":111,
     "players_list_make_playoffs":[
@@ -401,7 +401,7 @@
   },
   {
     "Team":"New Orleans Saints",
-    "probability_playofffs":0.0630904184,
+  "probability_playoffs":0,
     "points_playoffs":1194,
     "points_no_playoffs":109,
     "players_list_make_playoffs":null,
@@ -414,7 +414,7 @@
   },
   {
     "Team":"Cleveland Browns",
-    "probability_playofffs":0.0571126388,
+  "probability_playoffs":0,
     "points_playoffs":1293,
     "points_no_playoffs":108,
     "players_list_make_playoffs":[
