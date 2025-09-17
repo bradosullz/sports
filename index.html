@@ -8,7 +8,9 @@
 </head>
 <body>
 
+
     <h1>NFL Playoff Pick'em Standings</h1>
+    <div id="lastUpdated" style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Last Updated:</div>
 
     <table id="standingsTable">
         <thead>
@@ -25,10 +27,8 @@
     <div class="table-spacer"></div>
 
     <table id="selectedPlayerTableMakes" style="display:none;">
+        <caption id="selectedPlayerNameMakes"></caption>
         <thead>
-            <tr>
-                <th colspan="3" id="selectedPlayerNameMakes"></th>
-            </tr>
             <tr>
                 <th>Team</th>
                 <th>Points</th>
@@ -42,10 +42,8 @@
     <div class="table-spacer"></div>
 
     <table id="selectedPlayerTableMisses" style="display:none;">
+        <caption id="selectedPlayerNameMisses"></caption>
         <thead>
-            <tr>
-                <th colspan="3" id="selectedPlayerNameMisses"></th>
-            </tr>
             <tr>
                 <th>Team</th>
                 <th>Points</th>

@@ -50,7 +50,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    console.log("Merged Team Data:", teamData);
+    // Update the "Last Updated" timestamp to match the ESPN data
+    const lastUpdatedDiv = document.getElementById('lastUpdated');
+    if (lastUpdatedDiv) {
+        const espnDate = new Date(probabilityData.lastUpdated);
+        const formattedDate = espnDate.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+        lastUpdatedDiv.textContent = `Last Updated: ${formattedDate}`;
+    }
 
     /**
      * Calculate the 14 teams that make the playoffs in the most likely scenario that is consistent with the NFL playoff format
