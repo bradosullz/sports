@@ -33,20 +33,96 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Merge probability data into teamData based on team names
 
     const probabilityMap = {};
-    probabilityData.teams.forEach(teamD => {
-        probabilityMap[teamD.team.displayName] = teamD.categories[1].values[5] / 100; // Convert percentage to decimal
-    });
+        probabilityData.teams.forEach(teamD => {
+            probabilityMap[teamD.team.displayName] = {
+                playoffOdds: teamD.categories[1].values[5] / 100, 
+                divisionOdds: teamD.categories[1].values[4] / 100 
+            };
+        });
 
     teamData.forEach(team => {
         if (probabilityMap.hasOwnProperty(team.Team)) {
-            team.probability_playoffs = probabilityMap[team.Team];
+            team.probability_playoffs = probabilityMap[team.Team].playoffOdds;
+            team.probability_division_win = probabilityMap[team.Team].divisionOdds;
         } else {
             team.probability_playoffs = 0; // Default value if not found
+            team.probability_division_win = 0;
         }
     });
 
     console.log("Merged Team Data:", teamData);
 
+    /**
+     * Calculate the 14 teams that make the playoffs in the most likely scenario that is consistent with the NFL playoff format
+     * 
+     */
+    const divisions = {};
+    const afcTeams = [];
+    const nfcTeams = [];
+
+    // Group teams by division and separate them into AFC and NFC
+    teamData.forEach(team => {
+    const division = team.division;
+    if (!divisions[division]) {
+        divisions[division] = [];
+    }
+    divisions[division].push(team);
+
+    if (division.startsWith('AFC')) {
+        afcTeams.push(team);
+    } else if (division.startsWith('NFC')) {
+        nfcTeams.push(team);
+    }
+    });
+
+    // Set most_likely_playoffs to true for the division winner
+    for (const division in divisions) {
+    let divisionWinner = null;
+    let maxProb = -1;
+    divisions[division].forEach(team => {
+        if (team.probability_division_win > maxProb) {
+        maxProb = team.probability_division_win;
+        divisionWinner = team;
+        }
+    });
+    if (divisionWinner) {
+        divisionWinner.most_likely_playoffs = true;
+    }
+    }
+
+    // Filter out division winners from the remaining teams
+    const remainingAFCTeams = afcTeams.filter(team => !team.most_likely_playoffs);
+    const remainingNFCTeams = nfcTeams.filter(team => !team.most_likely_playoffs);
+
+    // Calculate a new metric for the remaining teams
+    remainingAFCTeams.forEach(team => {
+    team.probability_wildcard = team.probability_playoffs - team.probability_division_win;
+    });
+    remainingNFCTeams.forEach(team => {
+    team.probability_wildcard = team.probability_playoffs - team.probability_division_win;
+    });
+
+    // Sort the remaining teams by the new metric in descending order
+    remainingAFCTeams.sort((a, b) => b.probability_wildcard - a.probability_wildcard);
+    remainingNFCTeams.sort((a, b) => b.probability_wildcard - a.probability_wildcard);
+
+    // Set most_likely_playoffs to true for the top 3 wild card teams in each conference
+    for (let i = 0; i < 3 && i < remainingAFCTeams.length; i++) {
+    remainingAFCTeams[i].most_likely_playoffs = true;
+    }
+    for (let i = 0; i < 3 && i < remainingNFCTeams.length; i++) {
+    remainingNFCTeams[i].most_likely_playoffs = true;
+    }
+
+    // For all other teams, set most_likely_playoffs to false
+    teamData.forEach(team => {
+    if (typeof team.most_likely_playoffs === 'undefined') {
+        team.most_likely_playoffs = false;
+    }
+    });
+    
+    
+    
     /**
      * Calculate standings table
      */
@@ -67,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     teamData.forEach(team => {
     const {
         probability_playoffs,
+        most_likely_playoffs,
         points_playoffs,
         points_no_playoffs,
         players_list_make_playoffs,
@@ -83,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         playerData.expectedPoints += points_playoffs * probability_playoffs;
 
         // Calculate mostLikelyPoints
-        if (probability_playoffs >= 0.5) {
+        if (most_likely_playoffs === true) {
             playerData.mostLikelyPoints += points_playoffs;
         }
 
@@ -105,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         playerData.expectedPoints += points_no_playoffs * prob_miss_playoffs;
 
         // Calculate mostLikelyPoints
-        if (probability_playoffs < 0.5) {
+        if (most_likely_playoffs === false) {
             playerData.mostLikelyPoints += points_no_playoffs;
         }
 
