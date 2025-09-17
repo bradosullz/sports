@@ -48,33 +48,7 @@ th, td {
     border-bottom: 1px solid #ddd;
     font-size: 15px;
 }
-/*
-@media (max-width: 600px) {
-    table {
-        width: 100%;
-        font-size: 12px;
-        margin-bottom: 20px;
-        box-shadow: none;
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    th, td {
-        padding: 7px 4px;
-        font-size: 11px;
-    }
-    thead tr {
-        font-size: 12px;
-    }
-    body {
-        margin: 5px;
-    }
-    .container, .table-container {
-        width: 100%;
-        padding: 0;
-    }
-}
-*/
+
 thead tr {
     background-color: #0d47a1; /* NFL blue */
     color: #ffffff;
@@ -84,7 +58,7 @@ th {
     cursor: pointer;
     position: relative;
     user-select: none; /* Prevent text selection on click */
-    padding-right: 28px; /* Add space for sort arrow */
+    padding-right: 14px; /* Add space for sort arrow */
 }
 
 /* Arrows for sorting indication */
@@ -98,7 +72,16 @@ th::after {
     height: 7px;
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
-    opacity: 0.3;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+th[data-sort-dir]::after {
+    opacity: 0.0;
+}
+th[data-sort-dir="asc"]::after,
+th[data-sort-dir="desc"]::after {
+    opacity: 1;
 }
 
 
@@ -118,4 +101,62 @@ tbody tr:nth-of-type(even) {
 
 tbody tr:hover {
     background-color: #e9eff5;
+}
+
+@media (max-width: 600px) {
+    table {
+        width: 100vw;
+        max-width: 100vw;
+        min-width: 100vw;
+        box-sizing: border-box;
+        margin-left: 0;
+        margin-right: 0;
+        overflow-x: auto;
+        display: block;
+
+    th, td {
+    font-size: 13px;
+    }
+
+    th::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 4px;
+    height: 4px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    }
+    }
+}
+
+@media (max-width: 400px) {
+    table {
+        width: 100vw;
+        max-width: 100vw;
+        min-width: 0;
+        box-sizing: border-box;
+        margin-left: 0;
+        margin-right: 0;
+        overflow-x: auto;
+        display: block;
+    }
+
+    th, td {
+    font-size: 11px;
+    }
+
+    th::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 4px;
+    height: 4px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    }
 }
