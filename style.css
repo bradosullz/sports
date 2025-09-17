@@ -1,3 +1,10 @@
+/* Rounded corners for header row even with caption */
+table thead tr th:first-child {
+    border-top-left-radius: 8px;
+}
+table thead tr th:last-child {
+    border-top-right-radius: 8px;
+}
 h1 {
     color: #0d47a1; /* NFL blue */
 }
@@ -105,9 +112,9 @@ tbody tr:hover {
 
 @media (max-width: 600px) {
     table {
-        width: 100vw;
-        max-width: 100vw;
-        min-width: 100vw;
+        width: 98vw;
+        max-width: 98vw;
+        min-width: 98vw;
         box-sizing: border-box;
         margin-left: 0;
         margin-right: 0;
@@ -124,8 +131,8 @@ tbody tr:hover {
     right: 8px;
     top: 50%;
     transform: translateY(-50%) rotate(45deg);
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
     }
