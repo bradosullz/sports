@@ -110,7 +110,7 @@ tbody tr:hover {
     background-color: #e9eff5;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     table {
         width: 98vw;
         max-width: 98vw;
@@ -138,9 +138,6 @@ tbody tr:hover {
     }
     }
 
-    h1 {
-    color: #a10d0d; /* Mid Screen Red */
-    }
 }
 
 @media (max-width: 400px) {
@@ -171,7 +168,4 @@ tbody tr:hover {
     border-width: 0 2px 2px 0;
     }
 
-    h1 {
-    color: #0da119; /* Small Screen Green */
-    }
 }
