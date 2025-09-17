@@ -1,7 +1,6 @@
 [
   {
     "Team": "Buffalo Bills",
-    "probability_playoffs": 0,
     "points_playoffs": 116,
     "points_no_playoffs": 734,
     "players_list_make_playoffs": [
@@ -12,12 +11,10 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "AFC East"
   },
   {
     "Team": "Baltimore Ravens",
-    "probability_playoffs": 0,
     "points_playoffs": 122,
     "points_no_playoffs": 559,
     "players_list_make_playoffs": [
@@ -29,12 +26,10 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "AFC North"
   },
   {
     "Team": "Kansas City Chiefs",
-    "probability_playoffs": 0,
     "points_playoffs": 131,
     "points_no_playoffs": 425,
     "players_list_make_playoffs": [
@@ -45,12 +40,10 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "AFC West"
   },
   {
     "Team": "Philadelphia Eagles",
-    "probability_playoffs": 0,
     "points_playoffs": 132,
     "points_no_playoffs": 408,
     "players_list_make_playoffs": [
@@ -61,12 +54,10 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "NFC East"
   },
   {
     "Team": "San Francisco 49ers",
-    "probability_playoffs": 0,
     "points_playoffs": 156,
     "points_no_playoffs": 279,
     "players_list_make_playoffs": [
@@ -79,12 +70,10 @@
       "PM",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC West"
   },
   {
     "Team": "Detroit Lions",
-    "probability_playoffs": 0,
     "points_playoffs": 165,
     "points_no_playoffs": 253,
     "players_list_make_playoffs": [
@@ -93,12 +82,10 @@
       "BS"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "NFC North"
   },
   {
     "Team": "Tampa Bay Buccaneers",
-    "probability_playoffs": 0,
     "points_playoffs": 169,
     "points_no_playoffs": 244,
     "players_list_make_playoffs": [
@@ -108,22 +95,18 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "NFC South"
   },
   {
     "Team": "Houston Texans",
-    "probability_playoffs": 0,
     "points_playoffs": 175,
     "points_no_playoffs": 233,
     "players_list_make_playoffs": null,
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "AFC South"
   },
   {
     "Team": "Los Angeles Rams",
-    "probability_playoffs": 0,
     "points_playoffs": 175,
     "points_no_playoffs": 233,
     "players_list_make_playoffs": null,
@@ -132,12 +115,10 @@
       "CL",
       "PM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC West"
   },
   {
     "Team": "Cincinnati Bengals",
-    "probability_playoffs": 0,
     "points_playoffs": 177,
     "points_no_playoffs": 230,
     "players_list_make_playoffs": [
@@ -147,12 +128,10 @@
     "players_list_miss_playoffs": [
       "MG"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC North"
   },
   {
     "Team": "Green Bay Packers",
-    "probability_playoffs": 0,
     "points_playoffs": 180,
     "points_no_playoffs": 224,
     "players_list_make_playoffs": [
@@ -164,12 +143,10 @@
     "players_list_miss_playoffs": [
       "AK"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC North"
   },
   {
     "Team": "Denver Broncos",
-    "probability_playoffs": 0,
     "points_playoffs": 185,
     "points_no_playoffs": 217,
     "players_list_make_playoffs": [
@@ -178,12 +155,10 @@
       "WM"
     ],
     "players_list_miss_playoffs": null,
-    "most_likely_playoffs": false,
     "division": "AFC West"
   },
   {
     "Team": "Washington Commanders",
-    "probability_playoffs": 0,
     "points_playoffs": 187,
     "points_no_playoffs": 215,
     "players_list_make_playoffs": [
@@ -193,12 +168,10 @@
     "players_list_miss_playoffs": [
       "CL"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC East"
   },
   {
     "Team": "Los Angeles Chargers",
-    "probability_playoffs": 0,
     "points_playoffs": 192,
     "points_no_playoffs": 208,
     "players_list_make_playoffs": [
@@ -207,24 +180,20 @@
     "players_list_miss_playoffs": [
       "MG"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC West"
   },
   {
     "Team": "Minnesota Vikings",
-    "probability_playoffs": 0,
     "points_playoffs": 210,
     "points_no_playoffs": 191,
     "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC North"
   },
   {
-    "Team": "Arizona Cardinals",
-    "probability_playoffs": 0,
+    "Team": "Arizona Cardinals",,
     "points_playoffs": 235,
     "points_no_playoffs": 174,
     "players_list_make_playoffs": null,
@@ -233,12 +202,10 @@
       "MG",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC West"
   },
   {
     "Team": "Pittsburgh Steelers",
-    "probability_playoffs": 0,
     "points_playoffs": 242,
     "points_no_playoffs": 170,
     "players_list_make_playoffs": [
@@ -248,12 +215,10 @@
       "CL",
       "PM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC North"
   },
   {
     "Team": "Atlanta Falcons",
-    "probability_playoffs": 0,
     "points_playoffs": 260,
     "points_no_playoffs": 163,
     "players_list_make_playoffs": [
@@ -263,12 +228,10 @@
     "players_list_miss_playoffs": [
       "AK"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC South"
   },
   {
     "Team": "New England Patriots",
-    "probability_playoffs": 0,
     "points_playoffs": 279,
     "points_no_playoffs": 156,
     "players_list_make_playoffs": [
@@ -279,12 +242,10 @@
     "players_list_miss_playoffs": [
       "PM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC East"
   },
   {
     "Team": "Seattle Seahawks",
-    "probability_playoffs": 0,
     "points_playoffs": 283,
     "points_no_playoffs": 155,
     "players_list_make_playoffs": [
@@ -293,12 +254,10 @@
     "players_list_miss_playoffs": [
       "AK"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC West"
   },
   {
     "Team": "Jacksonville Jaguars",
-    "probability_playoffs": 0,
     "points_playoffs": 292,
     "points_no_playoffs": 152,
     "players_list_make_playoffs": null,
@@ -308,12 +267,10 @@
       "PM",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC South"
   },
   {
     "Team": "Chicago Bears",
-    "probability_playoffs": 0,
     "points_playoffs": 305,
     "points_no_playoffs": 149,
     "players_list_make_playoffs": null,
@@ -321,12 +278,10 @@
       "AK",
       "PM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC North"
   },
   {
     "Team": "Dallas Cowboys",
-    "probability_playoffs": 0,
     "points_playoffs": 309,
     "points_no_playoffs": 148,
     "players_list_make_playoffs": null,
@@ -337,12 +292,10 @@
       "PM",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC East"
   },
   {
     "Team": "Indianapolis Colts",
-    "probability_playoffs": 0,
     "points_playoffs": 322,
     "points_no_playoffs": 145,
     "players_list_make_playoffs": [
@@ -356,12 +309,10 @@
       "PM",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC South"
   },
   {
     "Team": "Miami Dolphins",
-    "probability_playoffs": 0,
     "points_playoffs": 347,
     "points_no_playoffs": 140,
     "players_list_make_playoffs": null,
@@ -375,12 +326,10 @@
       "PM",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC East"
   },
   {
     "Team": "Carolina Panthers",
-    "probability_playoffs": 0,
     "points_playoffs": 384,
     "points_no_playoffs": 135,
     "players_list_make_playoffs": null,
@@ -389,12 +338,10 @@
       "BW",
       "KK"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC South"
   },
   {
     "Team": "Las Vegas Raiders",
-    "probability_playoffs": 0,
     "points_playoffs": 483,
     "points_no_playoffs": 126,
     "players_list_make_playoffs": null,
@@ -403,12 +350,10 @@
       "KK",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC West"
   },
   {
     "Team": "Tennessee Titans",
-    "probability_playoffs": 0,
     "points_playoffs": 559,
     "points_no_playoffs": 122,
     "players_list_make_playoffs": [
@@ -422,12 +367,10 @@
       "CL",
       "KK"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC South"
   },
   {
     "Team": "New York Jets",
-    "probability_playoffs": 0,
     "points_playoffs": 697,
     "points_no_playoffs": 117,
     "players_list_make_playoffs": [
@@ -440,12 +383,10 @@
       "KK",
       "WM"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC East"
   },
   {
     "Team": "New York Giants",
-    "probability_playoffs": 0,
     "points_playoffs": 975,
     "points_no_playoffs": 111,
     "players_list_make_playoffs": [
@@ -456,12 +397,10 @@
       "BS",
       "KK"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC East"
   },
   {
     "Team": "New Orleans Saints",
-    "probability_playoffs": 0,
     "points_playoffs": 1194,
     "points_no_playoffs": 109,
     "players_list_make_playoffs": null,
@@ -471,12 +410,10 @@
       "KK",
       "MG"
     ],
-    "most_likely_playoffs": false,
     "division": "NFC South"
   },
   {
     "Team": "Cleveland Browns",
-    "probability_playoffs": 0,
     "points_playoffs": 1293,
     "points_no_playoffs": 108,
     "players_list_make_playoffs": [
@@ -489,7 +426,6 @@
       "KK",
       "MG"
     ],
-    "most_likely_playoffs": false,
     "division": "AFC North"
   }
 ]
