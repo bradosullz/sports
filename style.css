@@ -137,6 +137,10 @@ tbody tr:hover {
     border-width: 0 2px 2px 0;
     }
     }
+
+    h1 {
+    color: #a10d0d; /* Mid Screen Red Green */
+    }
 }
 
 @media (max-width: 400px) {
@@ -165,5 +169,9 @@ tbody tr:hover {
     height: 4px;
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
+    }
+
+    h1 {
+    color: #0da119; /* Small Screen Green */
     }
 }
