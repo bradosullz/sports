@@ -283,11 +283,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cellTeam = row.insertCell();
             cellTeam.textContent = team.Team;
 
-            // 2. Points Column
-            const cellPoints = row.insertCell();
-            cellPoints.textContent = team.points_playoffs;
+            // 2. Expected Points Column
+            const cellExpectedPoints = row.insertCell();
+            cellExpectedPoints.textContent = (team.probability_playoffs * team.points_playoffs).toFixed(0)
 
-            // 3. Playoff Probability Column
+            // 3. Full Points Column
+            const cellFullPoints = row.insertCell();
+            cellFullPoints.textContent = team.points_playoffs;
+
+            // 4. Playoff Probability Column
             const cellProbability = row.insertCell();
             // Format the number as a percentage with 2 decimal places
             const probabilityPercent = (team.probability_playoffs * 100).toFixed(1);
@@ -302,11 +306,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cellTeam = row.insertCell();
             cellTeam.textContent = team.Team;
 
-            // 2. Points Column
+            // 2. Expected Points Column
+            const cellExpectedPoints = row.insertCell();
+            cellExpectedPoints.textContent = ((1 - team.probability_playoffs) * team.points_no_playoffs).toFixed(0)
+            
+            // 3. Full Points Column
             const cellPoints = row.insertCell();
             cellPoints.textContent = team.points_no_playoffs;
 
-            // 3. Playoff Probability Column
+            // 4. Playoff Probability Column
             const cellProbability = row.insertCell();
             // Format the number as a percentage with 2 decimal places
             const probabilityPercent = ((1 - team.probability_playoffs) * 100).toFixed(1);
@@ -316,6 +324,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Make the table visible
         playerTableMakes.style.display = 'table';
         playerTableMisses.style.display = 'table';
+
+        // Sort the tables by Expected Points in descending order
+        sortTableByColumn(playerTableMakes, 1, 'desc');
+        sortTableByColumn(playerTableMisses, 1, 'desc');
     };
 
     /**
@@ -353,32 +365,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         sortedRows.forEach(row => tbody.appendChild(row));
     };
 
-    const table = document.getElementById('standingsTable');
-    const headers = table.querySelectorAll('th');
+    // Apply sorting to all tables in the document
+    document.querySelectorAll('table').forEach(table => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const columnIndex = parseInt(header.dataset.column, 10);
+                const currentDir = header.dataset.sortDir;
+                const newDir = currentDir === 'asc' ? 'desc' : 'asc';
 
-    headers.forEach(header => {
-        header.addEventListener('click', () => {
-            const columnIndex = parseInt(header.dataset.column, 10);
-            const currentDir = header.dataset.sortDir;
-            const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+                // Reset all header sort attributes for this table
+                headers.forEach(h => h.removeAttribute('data-sort-dir'));
 
-            // Reset all header sort attributes
-            headers.forEach(h => h.removeAttribute('data-sort-dir'));
+                // Set the new sort direction on the clicked header
+                header.dataset.sortDir = newDir;
 
-            // Set the new sort direction on the clicked header
-            header.dataset.sortDir = newDir;
-
-            sortTableByColumn(table, columnIndex, newDir);
+                sortTableByColumn(table, columnIndex, newDir);
+            });
         });
     });
 
-    // Initial default sort
-    const defaultSortHeader = document.querySelector('th[data-sort-dir]');
-    if (defaultSortHeader) {
-        const defaultColumnIndex = parseInt(defaultSortHeader.dataset.column, 10);
-        const defaultDirection = defaultSortHeader.dataset.sortDir;
-        sortTableByColumn(table, defaultColumnIndex, defaultDirection);
-    }
+    // Initial default sort for all columns with default sort direction
+    document.querySelectorAll('th[data-sort-dir]').forEach(header => {
+        const parentTable = header.closest('table');
+        if (!parentTable) return;
+        const columnIndex = parseInt(header.dataset.column, 10);
+        const direction = header.dataset.sortDir;
+        sortTableByColumn(parentTable, columnIndex, direction);
+    });
 
     // Make all rows in all tables selectable and highlight on click
     document.querySelectorAll('table').forEach(function(table) {
