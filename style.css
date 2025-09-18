@@ -14,9 +14,18 @@ caption {
     font-size: 1.2em;
     font-weight: bold;
     letter-spacing: 0.5px;
+    margin: 0 0 8px 20px;
+    text-align: center;
+    caption-side: top;
+    padding: 6px 0 2px 0;
+}
+h2 {
+    color: #0d47a1;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 0.5px;
     margin-bottom: 8px;
     text-align: left;
-    caption-side: top;
     padding: 6px 0 2px 0;
 }
 body {
@@ -106,7 +115,32 @@ tbody tr:nth-of-type(even) {
     background-color: #f9f9f9;
 }
 
+tbody tr:nth-of-type(odd) {
+    background-color: #f4f4f9;
+}
+
+
 tbody tr:hover {
+    background-color: #e9eff5;
+}
+
+.sticky-col {
+    position: -webkit-sticky; /* For Safari compatibility */
+    position: sticky;
+    left: 0;
+    z-index: 1; /* Ensures the sticky column stays on top */
+    background-color: inherit; /* Inherits the row's background color */
+}
+
+/* Ensure the sticky header has the correct background */
+thead .sticky-col {
+    background-color: #0d47a1;
+}
+
+
+
+/* Maintain the row hover effect on the sticky column */
+tbody tr:hover .sticky-col {
     background-color: #e9eff5;
 }
 

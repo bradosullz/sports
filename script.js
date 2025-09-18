@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     if (divisionWinner) {
         divisionWinner.most_likely_playoffs = true;
+        divisionWinner.playoffs_type = "Division Winner";
     }
     }
 
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const remainingAFCTeams = afcTeams.filter(team => !team.most_likely_playoffs);
     const remainingNFCTeams = nfcTeams.filter(team => !team.most_likely_playoffs);
 
-    // Calculate a new metric for the remaining teams
+    // Calculate wildcard probability for the remaining teams
     remainingAFCTeams.forEach(team => {
     team.probability_wildcard = team.probability_playoffs - team.probability_division_win;
     });
@@ -115,9 +116,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set most_likely_playoffs to true for the top 3 wild card teams in each conference
     for (let i = 0; i < 3 && i < remainingAFCTeams.length; i++) {
     remainingAFCTeams[i].most_likely_playoffs = true;
+    remainingAFCTeams[i].playoffs_type = "Wildcard";
     }
     for (let i = 0; i < 3 && i < remainingNFCTeams.length; i++) {
     remainingNFCTeams[i].most_likely_playoffs = true;
+    remainingNFCTeams[i].playoffs_type = "Wildcard";
     }
 
     // For all other teams, set most_likely_playoffs to false
@@ -127,7 +130,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     });
     
+    /**
+     * Populate the teams table with the updated team data
+     */
+    const teamsTableBody = document.querySelector("#teamsTable tbody");
+    teamsTableBody.innerHTML = ''; // Clear existing rows
     
+    teamData.forEach(team => {
+        const row = document.createElement("tr");
+
+        // Team Name
+        const teamCell = document.createElement("td");
+        teamCell.textContent = team.Team;
+        teamCell.classList.add("sticky-col");
+        row.appendChild(teamCell);
+        //Expected Points if Make Playoffs
+        const expectedPointsMakeCell = document.createElement("td");
+        expectedPointsMakeCell.textContent = (team.points_playoffs * team.probability_playoffs).toFixed(0);
+        row.appendChild(expectedPointsMakeCell);
+        // Expected Points if Miss Playoffs
+        const expectedPointsMissCell = document.createElement("td");
+        expectedPointsMissCell.textContent = (team.points_no_playoffs * (1 - team.probability_playoffs)).toFixed(0);
+        row.appendChild(expectedPointsMissCell);
+        //Full Points if Make Playoffs
+        const fullPointsMakeCell = document.createElement("td");
+        fullPointsMakeCell.textContent = team.points_playoffs;
+        row.appendChild(fullPointsMakeCell);
+        // Full Points if Miss Playoffs
+        const fullPointsMissCell = document.createElement("td");
+        fullPointsMissCell.textContent = team.points_no_playoffs;
+        row.appendChild(fullPointsMissCell);
+        // Playoff Probability
+        const playoffProbCell = document.createElement("td");
+        playoffProbCell.textContent = (team.probability_playoffs * 100).toFixed(1) + '%';
+        row.appendChild(playoffProbCell);
+        //Most Likely Scenario
+        const mostLikelyCell = document.createElement("td");
+        mostLikelyCell.textContent = team.most_likely_playoffs ? team.playoffs_type : 'Miss Playoffs';
+        row.appendChild(mostLikelyCell);
+
+        teamsTableBody.appendChild(row);
+
+        }
+    );
+
+
     
     /**
      * Calculate standings table
