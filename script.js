@@ -460,3 +460,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 });
+
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.querySelectorAll('table');
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    if (tabName === 'Standings') {
+        document.getElementById('standingsTable').style.display = "table";
+        // Check if a row is selected in standingsTable and show player picks tables
+        const selectedRow = document.querySelector('#standingsTable .selected-row');
+        if (selectedRow) {
+            document.getElementById('selectedPlayerTableMakes').style.display = "table";
+            document.getElementById('selectedPlayerTableMisses').style.display = "table";
+        }
+    } else if (tabName === 'Teams') {
+        document.getElementById('teamsTable').style.display = "table";
+    }
+    evt.currentTarget.className += " active";
+}
+
+// Set default tab to Standings on initial load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('.tablinks.active').click();
+});
