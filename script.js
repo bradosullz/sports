@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let teamData = [];
     let probabilityData = [];
     const playerMap = new Map();
+    const NUM_SIMULATIONS = 1048576; // 2^20 simulations for better accuracy
 
     // Fetches team data from the specified URL when the page loads.
     try {
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         team.most_likely_playoffs = false;
     }
     });
-    
+
     /**
      * Populate the teams table with the updated team data
      */
@@ -249,6 +250,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Populate the standings table with the calculated player data
     populateStandingsTable(playerMap);
+
+    // Create a new Web Worker
+    const worker = new Worker('worker.js');
+
+    // Send data to the worker
+    worker.postMessage({
+        teamData: teamData,
+        playerMap: playerMap,
+        divisions: divisions,
+        afcTeams: afcTeams,
+        nfcTeams: nfcTeams,
+        numSimulations: NUM_SIMULATIONS // Number of simulations
+    });
+
+    // Listen for messages from the worker
+    worker.onmessage = function(e) {
+        const updatedPlayerMap = e.data.playerMap;
+        // Update the win probability column after the simulation is complete
+        const standingsTableBody = document.querySelector("#standingsTable tbody");
+        Array.from(standingsTableBody.rows).forEach(row => {
+            const playerName = row.cells[0].textContent;
+            const playerData = updatedPlayerMap.get(playerName);
+            if (playerData) {
+                row.cells[3].textContent = (playerData.winProbability * 100).toFixed(0) + '% ';
+            }
+        });
+    };
     
     /**
      * Populates the standings table with data from a Map.
@@ -282,10 +310,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
             row.appendChild(mostLikelyPointsCell);
 
-            // Create and append the Maximum Points cell
-            const maxPointsCell = document.createElement("td");
-            maxPointsCell.textContent = playerData.maxPoints;
-            row.appendChild(maxPointsCell);
+            // Create and append the Win PRobability cell with a placeholder
+            const winProbabilityCell = document.createElement("td");
+            winProbabilityCell.textContent = "...";
+            row.appendChild(winProbabilityCell);
 
             // Append the completed row to the table body
             tableBody.appendChild(row);
@@ -459,6 +487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
     });
+
 });
 
 function openTab(evt, tabName) {
@@ -495,3 +524,4 @@ function openTab(evt, tabName) {
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.tablinks.active').click();
 });
+
