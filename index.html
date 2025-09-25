@@ -14,6 +14,7 @@
 
     <div class="tab">
         <button class="tablinks active" onclick="openTab(event, 'Standings')">Standings</button>
+        <button class="tablinks" onclick="openTab(event, 'Expanded Standings')">Expanded Standings</button>
         <button class="tablinks" onclick="openTab(event, 'Teams')">Teams</button>
     </div>
 
@@ -29,7 +30,7 @@
                 <th data-column="0">Player</th>
                 <th data-column="1" data-sort-dir="desc">Expected Points</th>
                 <th data-column="2">Most Likely Points</th>
-                <th data-column="3">Win Probability</th>
+                <th data-column="3">Win %</th>
             </tr>
         </thead>
         <tbody>
@@ -50,7 +51,7 @@
                 <th data-column="0">Team</th>
                 <th data-column="1" data-sort-dir="desc">Expected Points</th>
                 <th data-column="2">Full Points</th>
-                <th data-column="3">Playoff Probability</th>
+                <th data-column="3">Playoff %</th>
             </tr>
         </thead>
         <tbody>
@@ -72,7 +73,7 @@
                 <th data-column="0">Team</th>
                 <th data-column="1" data-sort-dir="desc">Expected Points</th>
                 <th data-column="2">Full Points</th>
-                <th data-column="3">Miss Probability</th>
+                <th data-column="3">Miss %</th>
             </tr>
         </thead>
         <tbody>
@@ -97,7 +98,7 @@
                 <th data-column="2">Expected Points Miss</th>
                 <th data-column="3">Full Points Playoffs</th>
                 <th data-column="4">Full Points Miss</th>
-                <th data-column="5">Playoff Probability</th>
+                <th data-column="5">Playoff %</th>
                 <th data-column="6">Most Likely Scenario</th>
             </tr>
         </thead>
@@ -105,6 +106,40 @@
         </tbody>
         </table>
     </div>
+
+    <div class="table-wrapper">
+        <table id="expandedStandingsTable" class="sticky-col-table" style="display:none;">
+        <colgroup>
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th data-column="0" class="sticky-col">Player</th>
+                <th data-column="1" data-sort-dir="desc">Win %</th>
+                <th data-column="2">Min Pts</th>
+                <th data-column="3">5th %ile</th>
+                <th data-column="4">25th %ile</th>
+                <th data-column="5">Median</th>
+                <th data-column="6">75th %ile</th>
+                <th data-column="7">95th %ile</th>
+                <th data-column="8">Max Pts</th>
+                <th data-column="9">Mode</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        </table>
+    </div>
+
     <script src="script.js"></script>
 
 </body>

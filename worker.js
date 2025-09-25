@@ -146,5 +146,5 @@ onmessage = async function(e) {
         }
     }
 
-    postMessage({ playerMap, completedSimulations: localNumSimulations });
+    postMessage({ playerMap, completedSimulations: localNumSimulations, percentilesCalculated: calculatePercentiles });
 };

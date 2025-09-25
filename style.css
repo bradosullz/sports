@@ -145,18 +145,27 @@ tbody tr:hover .sticky-col {
   border: 1px solid #ccc;
   background-color: #f1f1f1;
   margin-bottom: 10px;
+  display: flex; /* Use flexbox for better responsiveness */
+  flex-wrap: nowrap; /* Prevent wrapping to a second line */
+  overflow-x: auto; /* Enable horizontal scrolling if tabs overflow */
 }
 
 /* Style the buttons inside the tab */
 .tab button {
   background-color: inherit;
-  float: left;
+  flex: 1 1 0; /* Ensure all buttons have equal width */
+  white-space: normal; /* Allow text to wrap to a second line */
   border: none;
   outline: none;
   cursor: pointer;
   padding: 14px 16px;
   transition: 0.3s;
   font-size: 17px;
+  border-right: 1px solid #ccc; /* Add right border */
+}
+
+.tab button:last-child {
+    border-right: none; /* Remove right border from the last button */
 }
 
 /* Change background color of buttons on hover */
@@ -215,6 +224,11 @@ tbody tr:hover .sticky-col {
         z-index: 1; /* Ensures the sticky column stays on top */
         background-color: inherit; /* Inherits the row's background color */
     }
+
+    .tab button {
+        padding: 10px 8px; /* Smaller padding on mobile */
+        font-size: 14px; /* Smaller font size on mobile */
+    }
 }
 
 
@@ -246,5 +260,16 @@ tbody tr:hover .sticky-col {
     border-width: 0 2px 2px 0;
     }
 
+    .tab button {
+        padding: 8px 5px; /* Even smaller padding on very small screens */
+        font-size: 12px; /* Even smaller font size on very small screens */
+    }
 }
 
+/* Remove rounded corners for tables with class sticky-col-table */
+.sticky-col-table thead tr th:first-child {
+    border-top-left-radius: 0;
+}
+.sticky-col-table thead tr th:last-child {
+    border-top-right-radius: 0;
+}

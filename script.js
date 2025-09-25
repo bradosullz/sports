@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         expectedPoints: 0,
         mostLikelyPoints: 0,
         maxPoints: 0,
+        minPoints: 0,
         simulatedWins: 0
         });
     }
@@ -227,6 +228,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (probability_playoffs > 0) {
             playerData.maxPoints += points_playoffs;
         }
+        // Calculate minPoints
+        if (probability_playoffs == 1) {
+            playerData.minPoints += points_playoffs;
+        }
         });
     }
 
@@ -249,12 +254,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (probability_playoffs < 1) {
             playerData.maxPoints += points_no_playoffs;
         }
+
+        // Calculate minPoints
+        if (probability_playoffs == 0) {
+            playerData.minPoints += points_no_playoffs;
+        }
         });
     }
     });
 
-    // Populate the standings table with the calculated player data
+    // Populate the standings and expanded standings tables with the calculated player data
     populateStandingsTable(playerMap);
+    populateExpandedStandingsTable(playerMap);
 
     // Create a collection of Web Workers
     const workers = [];
@@ -291,7 +302,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            // Update the win probability column after the simulation is complete
+
+            //Update win probabilities in the playerMap
+            playerMap.forEach(playerData => {
+                playerData.winProbability = playerData.simulatedWins / completedSimulations;
+            });
+            
+            
+            // Update the win probability column in Standings table after the simulation is complete
             const standingsTableBody = document.querySelector("#standingsTable tbody");
             Array.from(standingsTableBody.rows).forEach(row => {
                 const playerName = row.cells[0].textContent;
@@ -305,10 +323,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             //Write number of simulations to console
             console.log(`Completed Simulations: ${completedSimulations}`);
 
-            //If this is a percentile calculation, update the playerMap with the percentiles
-            if (e.data.playerMap.values().next().value?.percentile_05 != undefined) {
+            //If this is a percentile calculation, update the playerMap with the percentiles and update the expanded standings table
+            if (e.data.percentilesCalculated) {
                 console.log("Percentiles calculated");
+                // Copy properties from e.data.playerMap for each player
+                simulationPlayerMap.forEach((data, player) => {
+                    if (playerMap.has(player)) {
+                        const playerData = playerMap.get(player);
+                        playerData.percentile_05 = data.percentile_05;
+                        playerData.percentile_25 = data.percentile_25;
+                        playerData.percentile_50 = data.percentile_50;
+                        playerData.percentile_75 = data.percentile_75;
+                        playerData.percentile_95 = data.percentile_95;
+                        playerData.simulatedMin = data.simulatedMin;
+                        playerData.simulatedMax = data.simulatedMax;
+                        playerData.mode = data.mode;
+                    }
+                });
             }
+
+            // Update the Expanded Standings table after the simulation is complete
+            populateExpandedStandingsTable(playerMap);
 
             // If we haven't reached sufficient simulations, send doulbe the amount of simulations to the worker
             if (completedSimulations < SUFFICIENT_SIMULATIONS) {
@@ -319,7 +354,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     divisions: divisions,
                     afcTeams: afcTeams,
                     nfcTeams: nfcTeams,
-                    numSimulations: nextSimulations
+                    numSimulations: nextSimulations,
+                    calculatePercentiles: false
                 });
             }
         };
@@ -366,8 +402,85 @@ document.addEventListener('DOMContentLoaded', async () => {
             tableBody.appendChild(row);
         }
     }
+ 
     
     
+    /**
+     * Populates the expanded standings table with data from a Map.
+     * @param {Map<string, Object>} playerMap - The map containing player data.
+     */
+    function populateExpandedStandingsTable(playerMap) {
+        const tableBody = document.querySelector("#expandedStandingsTable tbody");
+        tableBody.innerHTML = ''; // Clear any existing rows
+
+        for (const playerData of playerMap.values()) {
+            const row = document.createElement("tr");
+
+            // Player
+            const playerCell = document.createElement("td");
+            playerCell.textContent = playerData.player;
+            playerCell.classList.add("sticky-col");
+            row.appendChild(playerCell);
+
+            // Win Probability
+            const winProbabilityCell = document.createElement("td");
+            const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
+            winProbabilityCell.textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
+            row.appendChild(winProbabilityCell);
+
+            // Min Points
+            const minPointsCell = document.createElement("td");
+            minPointsCell.textContent = playerData.minPoints;
+            row.appendChild(minPointsCell);
+
+            // 5th %ile
+            const percentile05Cell = document.createElement("td");
+            percentile05Cell.textContent = playerData.percentile_05 !== undefined ? playerData.percentile_05.toFixed(0) : '...';
+            row.appendChild(percentile05Cell);
+
+            // 25th %ile
+            const percentile25Cell = document.createElement("td");
+            percentile25Cell.textContent = playerData.percentile_25 !== undefined ? playerData.percentile_25.toFixed(0) : '...';
+            row.appendChild(percentile25Cell);
+
+            // Median
+            const medianCell = document.createElement("td");
+            medianCell.textContent = playerData.percentile_50 !== undefined ? playerData.percentile_50.toFixed(0) : '...';
+            row.appendChild(medianCell);
+
+            // 75th %ile
+            const percentile75Cell = document.createElement("td");
+            percentile75Cell.textContent = playerData.percentile_75 !== undefined ? playerData.percentile_75.toFixed(0) : '...';
+            row.appendChild(percentile75Cell);
+
+            // 95th %ile
+            const percentile95Cell = document.createElement("td");
+            percentile95Cell.textContent = playerData.percentile_95 !== undefined ? playerData.percentile_95.toFixed(0) : '...';
+            row.appendChild(percentile95Cell);
+
+            // Max Points
+            const maxPointsCell = document.createElement("td");
+            maxPointsCell.textContent = playerData.maxPoints;
+            row.appendChild(maxPointsCell);
+
+            // Mode
+            const modeCell = document.createElement("td");
+            modeCell.textContent = playerData.mode !== undefined ? playerData.mode.join(', ') : '...';
+            row.appendChild(modeCell);
+
+            tableBody.appendChild(row);
+        }
+
+        // Sort the table after populating
+        const expandedStandingsTable = document.getElementById('expandedStandingsTable');
+        const currentSortHeader = expandedStandingsTable.querySelector('th[data-sort-dir]');
+        if (currentSortHeader) {
+            const columnIndex = parseInt(currentSortHeader.dataset.column, 10);
+            const direction = currentSortHeader.dataset.sortDir;
+            sortTableByColumn(expandedStandingsTable, columnIndex, direction);
+        }
+    }
+
     /**
      * Populates the selected player's table with teams they picked to make the playoffs.
      * @param {string} playerName The name of the selected player (e.g., "AK").
@@ -458,7 +571,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      * @param {number} column The index of the column to sort
      * @param {string} dir The direction to sort ('asc' or 'desc')
      */
-    const sortTableByColumn = (table, column, dir) => {
+    function sortTableByColumn(table, column, dir) {
         const tbody = table.tBodies[0];
         const rows = Array.from(tbody.querySelectorAll("tr"));
 
@@ -561,6 +674,8 @@ function openTab(evt, tabName) {
             document.getElementById('selectedPlayerTableMakes').style.display = "table";
             document.getElementById('selectedPlayerTableMisses').style.display = "table";
         }
+    } else if (tabName === 'Expanded Standings') {
+        document.getElementById('expandedStandingsTable').style.display = "table";
     } else if (tabName === 'Teams') {
         document.getElementById('teamsTable').style.display = "table";
     }
