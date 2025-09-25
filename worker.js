@@ -3,15 +3,15 @@ onmessage = async function(e) {
 
     // Initialize win probabilities for all players
     for (const playerData of playerMap.values()) {
-        playerData.winProbability = 0;
+        playerData.simulatedWins = 0;
     }
 
     // Run numSimulations simulations
     for (let sim = 0; sim < numSimulations; sim++) {
         // Progress indicator in console every 100 simulations
-        if (sim % 100 === 0) {
-            console.log(`Simulation ${sim} of ${numSimulations}`);
-        }
+        //if (sim % 100 === 0) {
+        //    console.log(`Simulation ${sim} of ${numSimulations}`);
+        //}
         
         // Track which teams make playoffs in this simulation
         const playoffTeams = new Set();
@@ -83,10 +83,10 @@ onmessage = async function(e) {
             .map(([player, _]) => player);
 
         // Distribute 1 / numSimulations probability among winners
-        const probPerWinner = (1 / numSimulations) / winners.length;
+        const simulatedWinsPerPlayer = 1 / winners.length;
         winners.forEach(winner => {
-            playerMap.get(winner).winProbability += probPerWinner;
+            playerMap.get(winner).simulatedWins += simulatedWinsPerPlayer;
         });
     }
-    postMessage({ playerMap });
+    postMessage({ playerMap, completedSimulations: numSimulations });
 };

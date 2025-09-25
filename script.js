@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let teamData = [];
     let probabilityData = [];
     const playerMap = new Map();
-    const NUM_SIMULATIONS = 1048576; // 2^20 simulations for better accuracy
+    const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
+    const INITIAL_SIMULATIONS = 65536; // 2^16 simulations for initial quick results
+    const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
+    //const NUM_SIMULATIONS = 65536; // 2^20 simulations for better accuracy
+    let completedSimulations = 0;
 
     // Fetches team data from the specified URL when the page loads.
     try {
@@ -188,7 +192,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         player: player,
         expectedPoints: 0,
         mostLikelyPoints: 0,
-        maxPoints: 0
+        maxPoints: 0,
+        simulatedWins: 0
         });
     }
     };
@@ -251,32 +256,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Populate the standings table with the calculated player data
     populateStandingsTable(playerMap);
 
-    // Create a new Web Worker
-    const worker = new Worker('worker.js');
+    // Create a collection of Web Workers
+    const workers = [];
+    for (let i = 0; i < NUM_WORKERS; i++) {
+        const worker = new Worker('worker.js');
+        workers.push(worker);
+    }
 
-    // Send data to the worker
-    worker.postMessage({
-        teamData: teamData,
-        playerMap: playerMap,
-        divisions: divisions,
-        afcTeams: afcTeams,
-        nfcTeams: nfcTeams,
-        numSimulations: NUM_SIMULATIONS // Number of simulations
-    });
-
-    // Listen for messages from the worker
-    worker.onmessage = function(e) {
-        const updatedPlayerMap = e.data.playerMap;
-        // Update the win probability column after the simulation is complete
-        const standingsTableBody = document.querySelector("#standingsTable tbody");
-        Array.from(standingsTableBody.rows).forEach(row => {
-            const playerName = row.cells[0].textContent;
-            const playerData = updatedPlayerMap.get(playerName);
-            if (playerData) {
-                row.cells[3].textContent = (playerData.winProbability * 100).toFixed(0) + '% ';
-            }
+    // Iterate through the worker, send the same data, and assign the same listener
+    workers.forEach(worker => {
+        // Send data to the worker
+        worker.postMessage({
+            teamData: teamData,
+            playerMap: playerMap,
+            divisions: divisions,
+            afcTeams: afcTeams,
+            nfcTeams: nfcTeams,
+            numSimulations: INITIAL_SIMULATIONS // Number of simulations
         });
-    };
+
+        // Listen for messages from the worker
+        worker.onmessage = function(e) {
+            const simulationPlayerMap = e.data.playerMap;
+            completedSimulations += e.data.completedSimulations;
+
+            // Update the number of simulated wins for each player
+            simulationPlayerMap.forEach((data, player) => {
+                if (playerMap.has(player)) {
+                    playerMap.get(player).simulatedWins += data.simulatedWins;
+                    playerMap.get(player).winProbability = playerMap.get(player).simulatedWins / completedSimulations;
+                }
+            });
+
+            // Update the win probability column after the simulation is complete
+            const standingsTableBody = document.querySelector("#standingsTable tbody");
+            Array.from(standingsTableBody.rows).forEach(row => {
+                const playerName = row.cells[0].textContent;
+                const playerData = playerMap.get(playerName);
+                const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
+                if (playerData) {
+                    row.cells[3].textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
+                }
+            });
+
+            //Write number of simulations to console
+            console.log(`Completed Simulations: ${completedSimulations}`);
+
+            // If we haven't reached sufficient simulations, send doulbe the amount of simulations to the worker
+            if (completedSimulations < SUFFICIENT_SIMULATIONS) {
+                worker.postMessage({
+                    teamData: teamData,
+                    playerMap: playerMap,
+                    divisions: divisions,
+                    afcTeams: afcTeams,
+                    nfcTeams: nfcTeams,
+                    numSimulations: e.data.completedSimulations * 2 // Number of simulations
+                });
+            }
+        };
+    });
     
     /**
      * Populates the standings table with data from a Map.
