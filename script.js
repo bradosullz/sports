@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let probabilityData = [];
     const playerMap = new Map();
     const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
-    const INITIAL_SIMULATIONS = 65536; // 2^16 simulations for initial quick results
+    const INITIAL_SIMULATIONS = 16384; // 2^16 simulations for initial quick results
     const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
     //const NUM_SIMULATIONS = 65536; // 2^20 simulations for better accuracy
     let completedSimulations = 0;
@@ -304,13 +304,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // If we haven't reached sufficient simulations, send doulbe the amount of simulations to the worker
             if (completedSimulations < SUFFICIENT_SIMULATIONS) {
+                const nextSimulations = Math.min(e.data.completedSimulations * 2, Math.ceil((SUFFICIENT_SIMULATIONS - completedSimulations)  / NUM_WORKERS));
                 worker.postMessage({
                     teamData: teamData,
                     playerMap: playerMap,
                     divisions: divisions,
                     afcTeams: afcTeams,
                     nfcTeams: nfcTeams,
-                    numSimulations: e.data.completedSimulations * 2 // Number of simulations
+                    numSimulations: nextSimulations
                 });
             }
         };
