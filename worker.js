@@ -1,18 +1,26 @@
 onmessage = async function(e) {
-    const { teamData, playerMap, divisions, afcTeams, nfcTeams, numSimulations } = e.data;
+    const { teamData, playerMap, divisions, afcTeams, nfcTeams, numSimulations, calculatePercentiles } = e.data;
 
     // Initialize win probabilities for all players
     for (const playerData of playerMap.values()) {
         playerData.simulatedWins = 0;
     }
 
+    // Initialize a Map to store points for each player in each simulation
+    const playerPointsHistory = new Map();
+    for (const player of playerMap.keys()) {
+        playerPointsHistory.set(player, []);
+    }
+
+    // If calculatePercentiles is true, override numSimulations to 1,000,000
+    let localNumSimulations = numSimulations;
+    if (calculatePercentiles) {
+        localNumSimulations = 1000000;
+    }
+
     // Run numSimulations simulations
-    for (let sim = 0; sim < numSimulations; sim++) {
-        // Progress indicator in console every 100 simulations
-        //if (sim % 100 === 0) {
-        //    console.log(`Simulation ${sim} of ${numSimulations}`);
-        //}
-        
+    for (let sim = 0; sim < localNumSimulations; sim++) {
+         
         // Track which teams make playoffs in this simulation
         const playoffTeams = new Set();
         
@@ -82,11 +90,61 @@ onmessage = async function(e) {
             .filter(([_, points]) => points === maxPoints)
             .map(([player, _]) => player);
 
-        // Distribute 1 / numSimulations probability among winners
+        // Distribute 1 win among winners
         const simulatedWinsPerPlayer = 1 / winners.length;
         winners.forEach(winner => {
             playerMap.get(winner).simulatedWins += simulatedWinsPerPlayer;
         });
+
+        // Store points for this simulation if CalculatePercentiles is true
+        if (calculatePercentiles) {
+        
+            for (const [player, points] of playerPoints) {
+                playerPointsHistory.get(player).push(points);
+            }
+        }
     }
-    postMessage({ playerMap, completedSimulations: numSimulations });
+
+    // Calculate percentiles if required
+    if (calculatePercentiles) {
+        for (const [player, pointsList] of playerPointsHistory) {
+            pointsList.sort((a, b) => a - b); // Sort points
+
+            // Calculate 10th, 50th (median), and 90th percentiles
+            const percentiles = [0.05, 0.25, 0.5, 0.75, 0.95, 0, 0.9999999].map(p => {
+                const index = Math.floor(p * pointsList.length);
+                return pointsList[index];
+            });
+
+            // Store percentiles in playerMap
+            const playerData = playerMap.get(player);
+            playerData.percentile_05 = percentiles[0];
+            playerData.percentile_25 = percentiles[1];
+            playerData.percentile_50 = percentiles[2];
+            playerData.percentile_75 = percentiles[3];
+            playerData.percentile_95 = percentiles[4];
+            playerData.simulatedMin = percentiles[5];
+            playerData.simulatedMax = percentiles[6];
+            
+            // Calculate the mode
+            const frequencyMap = new Map();
+            let maxCount = 0;
+            let mode = [];
+
+            for (const points of pointsList) {
+                const count = (frequencyMap.get(points) || 0) + 1;
+                frequencyMap.set(points, count);
+
+                if (count > maxCount) {
+                    maxCount = count;
+                    mode = [points];
+                } else if (count === maxCount) {
+                    mode.push(points);
+                }
+            }
+            playerData.mode = mode;
+        }
+    }
+
+    postMessage({ playerMap, completedSimulations: localNumSimulations });
 };

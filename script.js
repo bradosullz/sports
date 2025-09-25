@@ -263,7 +263,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         workers.push(worker);
     }
 
-    // Iterate through the worker, send the same data, and assign the same listener
+    // Iterate through the workers, send the same data, and assign the same listener
+    // One worker will also calculate percentiles
+    let needPercentilesCalculated = true;
     workers.forEach(worker => {
         // Send data to the worker
         worker.postMessage({
@@ -272,9 +274,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             divisions: divisions,
             afcTeams: afcTeams,
             nfcTeams: nfcTeams,
-            numSimulations: INITIAL_SIMULATIONS // Number of simulations
+            numSimulations: INITIAL_SIMULATIONS, // Number of simulations
+            calculatePercentiles: needPercentilesCalculated
         });
-
+        needPercentilesCalculated = false;
         // Listen for messages from the worker
         worker.onmessage = function(e) {
             const simulationPlayerMap = e.data.playerMap;
@@ -301,6 +304,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             //Write number of simulations to console
             console.log(`Completed Simulations: ${completedSimulations}`);
+
+            //If this is a percentile calculation, update the playerMap with the percentiles
+            if (e.data.playerMap.values().next().value?.percentile_05 != undefined) {
+                console.log("Percentiles calculated");
+            }
 
             // If we haven't reached sufficient simulations, send doulbe the amount of simulations to the worker
             if (completedSimulations < SUFFICIENT_SIMULATIONS) {
