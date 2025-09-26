@@ -1,5 +1,5 @@
 onmessage = async function(e) {
-    const { teamData, playerMap, divisions, afcTeams, nfcTeams, numSimulations, calculatePercentiles } = e.data;
+    const { teamData, playerMap, numSimulations, calculatePercentiles } = e.data;
 
     // Initialize win probabilities for all players
     for (const playerData of playerMap.values()) {
@@ -25,8 +25,8 @@ onmessage = async function(e) {
         const playoffTeams = new Set();
         
         // 1a) For each division, randomly sample 1 team weighted by division win probability
-        for (const division in divisions) {
-            const divisionTeams = divisions[division];
+        for (const division in teamData.divisions) {
+            const divisionTeams = teamData.divisions[division];
             const weights = divisionTeams.map(team => team.probability_division_win);
             const totalWeight = weights.reduce((a, b) => a + b, 0);
             let random = Math.random() * totalWeight;
@@ -42,7 +42,7 @@ onmessage = async function(e) {
 
         // 1b & 1c) For each conference, sample 3 wildcard teams
         ['AFC', 'NFC'].forEach(conference => {
-            const conferenceTeams = conference === 'AFC' ? afcTeams : nfcTeams;
+            const conferenceTeams = conference === 'AFC' ? teamData.afcTeams : teamData.nfcTeams;
             const remainingTeams = conferenceTeams.filter(team => !playoffTeams.has(team));
             const weights = remainingTeams.map(team => 
                 Math.max(0, team.probability_playoffs - team.probability_division_win)

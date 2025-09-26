@@ -71,6 +71,9 @@ export async function updateTeamData(teamData) {
         nfcTeams.push(team);
     }
     });
+    teamData.divisions = divisions; // Store divisions in teamData for potential future use
+    teamData.afcTeams = afcTeams; // Store AFC teams in teamData for potential future use
+    teamData.nfcTeams = nfcTeams; // Store NFC teams in teamData for potential future use
 
     // Set most_likely_playoffs to true for the division winner
     for (const division in divisions) {
