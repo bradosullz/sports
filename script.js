@@ -1,14 +1,18 @@
 import { updateTeamData } from './computestats.js';
 
+let completedSimulations = 0;
+let teamData = [];
+const playerMap = new Map();
+const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
+const INITIAL_SIMULATIONS = 16384; // 2^16 simulations for initial quick results
+const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
-    let teamData = [];
-    const playerMap = new Map();
-    const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
-    const INITIAL_SIMULATIONS = 16384; // 2^16 simulations for initial quick results
-    const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
+
     //const NUM_SIMULATIONS = 65536; // 2^20 simulations for better accuracy
-    let completedSimulations = 0;
+
 
     
     // Fetch and update team data with probabilities from ESPN
@@ -208,48 +212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     /**
-     * Populates the standings table with data from a Map.
-     * @param {Map<string, Object>} playerMap - The map containing player data.
-     */
-    function populateStandingsTable(playerMap) {
-        // Get the table body element
-        const tableBody = document.querySelector("#standingsTable tbody");
-
-        // Clear any existing rows
-        tableBody.innerHTML = '';
-
-        // Loop through each player object in the map's values
-        for (const playerData of playerMap.values()) {
-            // Create a new table row
-            const row = document.createElement("tr");
-
-            // Create and append the Player cell
-            const playerCell = document.createElement("td");
-            playerCell.textContent = playerData.player;
-            row.appendChild(playerCell);
-
-            // Create and append the Expected Points cell
-            const expectedPointsCell = document.createElement("td");
-            // Format to 2 decimal places for readability
-            expectedPointsCell.textContent = playerData.expectedPoints.toFixed(0);
-            row.appendChild(expectedPointsCell);
-
-            // Create and append the Most Likely Points cell
-            const mostLikelyPointsCell = document.createElement("td");
-            mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
-            row.appendChild(mostLikelyPointsCell);
-
-            // Create and append the Win PRobability cell with a placeholder
-            const winProbabilityCell = document.createElement("td");
-            winProbabilityCell.textContent = "...";
-            row.appendChild(winProbabilityCell);
-
-            // Append the completed row to the table body
-            tableBody.appendChild(row);
-        }
-    }
- 
-    /**
      * Populates the teams table with the updated team data
      * @param {Array} allTeamData The full array of team data from the JSON file.
      */
@@ -295,81 +257,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    /**
-     * Populates the expanded standings table with data from a Map.
-     * @param {Map<string, Object>} playerMap - The map containing player data.
-     */
-    function populateExpandedStandingsTable(playerMap) {
-        const tableBody = document.querySelector("#expandedStandingsTable tbody");
-        tableBody.innerHTML = ''; // Clear any existing rows
-
-        for (const playerData of playerMap.values()) {
-            const row = document.createElement("tr");
-
-            // Player
-            const playerCell = document.createElement("td");
-            playerCell.textContent = playerData.player;
-            playerCell.classList.add("sticky-col");
-            row.appendChild(playerCell);
-
-            // Win Probability
-            const winProbabilityCell = document.createElement("td");
-            const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
-            winProbabilityCell.textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
-            row.appendChild(winProbabilityCell);
-
-            // Min Points
-            const minPointsCell = document.createElement("td");
-            minPointsCell.textContent = playerData.minPoints;
-            row.appendChild(minPointsCell);
-
-            // 5th %ile
-            const percentile05Cell = document.createElement("td");
-            percentile05Cell.textContent = playerData.percentile_05 !== undefined ? playerData.percentile_05.toFixed(0) : '...';
-            row.appendChild(percentile05Cell);
-
-            // 25th %ile
-            const percentile25Cell = document.createElement("td");
-            percentile25Cell.textContent = playerData.percentile_25 !== undefined ? playerData.percentile_25.toFixed(0) : '...';
-            row.appendChild(percentile25Cell);
-
-            // Median
-            const medianCell = document.createElement("td");
-            medianCell.textContent = playerData.percentile_50 !== undefined ? playerData.percentile_50.toFixed(0) : '...';
-            row.appendChild(medianCell);
-
-            // 75th %ile
-            const percentile75Cell = document.createElement("td");
-            percentile75Cell.textContent = playerData.percentile_75 !== undefined ? playerData.percentile_75.toFixed(0) : '...';
-            row.appendChild(percentile75Cell);
-
-            // 95th %ile
-            const percentile95Cell = document.createElement("td");
-            percentile95Cell.textContent = playerData.percentile_95 !== undefined ? playerData.percentile_95.toFixed(0) : '...';
-            row.appendChild(percentile95Cell);
-
-            // Max Points
-            const maxPointsCell = document.createElement("td");
-            maxPointsCell.textContent = playerData.maxPoints;
-            row.appendChild(maxPointsCell);
-
-            // Mode
-            const modeCell = document.createElement("td");
-            modeCell.textContent = playerData.mode !== undefined ? playerData.mode.join(', ') : '...';
-            row.appendChild(modeCell);
-
-            tableBody.appendChild(row);
-        }
-
-        // Sort the table after populating
-        const expandedStandingsTable = document.getElementById('expandedStandingsTable');
-        const currentSortHeader = expandedStandingsTable.querySelector('th[data-sort-dir]');
-        if (currentSortHeader) {
-            const columnIndex = parseInt(currentSortHeader.dataset.column, 10);
-            const direction = currentSortHeader.dataset.sortDir;
-            sortTableByColumn(expandedStandingsTable, columnIndex, direction);
-        }
-    }
 
     /**
      * Populates the selected player's table with teams they picked to make the playoffs.
@@ -571,6 +458,114 @@ function openTab(evt, tabName) {
     }
     evt.currentTarget.className += " active";
 }
+
+/**
+ * Populates the standings table with data from a Map.
+ * @param {Map<string, Object>} playerMap - The map containing player data.
+ */
+function populateStandingsTable(playerMap) {
+    // Get the table body element
+    const tableBody = document.querySelector("#standingsTable tbody");
+    // Clear any existing rows
+    tableBody.innerHTML = '';
+   // Loop through each player object in the map's values
+    for (const playerData of playerMap.values()) {
+        // Create a new table row
+        const row = document.createElement("tr");
+        // Create and append the Player cell
+        const playerCell = document.createElement("td");
+        playerCell.textContent = playerData.player;
+        row.appendChild(playerCell);
+
+        // Create and append the Expected Points cell
+        const expectedPointsCell = document.createElement("td");
+        // Format to 2 decimal places for readability
+        expectedPointsCell.textContent = playerData.expectedPoints.toFixed(0);
+        row.appendChild(expectedPointsCell);
+
+        // Create and append the Most Likely Points cell
+        const mostLikelyPointsCell = document.createElement("td");
+        mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
+        row.appendChild(mostLikelyPointsCell);
+
+        // Create and append the Win PRobability cell with a placeholder
+        const winProbabilityCell = document.createElement("td");
+        winProbabilityCell.textContent = "...";
+        row.appendChild(winProbabilityCell);
+
+        // Append the completed row to the table body
+        tableBody.appendChild(row);
+    }
+}
+
+/**
+ * Populates the expanded standings table with data from a Map.
+ * @param {Map<string, Object>} playerMap - The map containing player data.
+ */
+function populateExpandedStandingsTable(playerMap) {
+    const tableBody = document.querySelector("#expandedStandingsTable tbody");
+    tableBody.innerHTML = ''; // Clear any existing rows
+    for (const playerData of playerMap.values()) {
+        const row = document.createElement("tr");
+
+        // Player
+        const playerCell = document.createElement("td");
+        playerCell.textContent = playerData.player;
+        playerCell.classList.add("sticky-col");
+        row.appendChild(playerCell);
+
+        // Win Probability
+        const winProbabilityCell = document.createElement("td");
+        const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
+        winProbabilityCell.textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
+        row.appendChild(winProbabilityCell);
+
+        // Min Points
+        const minPointsCell = document.createElement("td");
+        minPointsCell.textContent = playerData.minPoints;
+        row.appendChild(minPointsCell);
+
+        // 5th %ile
+        const percentile05Cell = document.createElement("td");
+        percentile05Cell.textContent = playerData.percentile_05 !== undefined ? playerData.percentile_05.toFixed(0) : '...';
+        row.appendChild(percentile05Cell);
+
+        // 25th %ile
+        const percentile25Cell = document.createElement("td");
+        percentile25Cell.textContent = playerData.percentile_25 !== undefined ? playerData.percentile_25.toFixed(0) : '...';
+        row.appendChild(percentile25Cell);
+
+        // Median
+        const medianCell = document.createElement("td");
+        medianCell.textContent = playerData.percentile_50 !== undefined ? playerData.percentile_50.toFixed(0) : '...';
+        row.appendChild(medianCell);
+
+        // 75th %ile
+        const percentile75Cell = document.createElement("td");
+        percentile75Cell.textContent = playerData.percentile_75 !== undefined ? playerData.percentile_75.toFixed(0) : '...';
+        row.appendChild(percentile75Cell);
+
+        // 95th %ile
+        const percentile95Cell = document.createElement("td");
+        percentile95Cell.textContent = playerData.percentile_95 !== undefined ? playerData.percentile_95.toFixed(0) : '...';
+        row.appendChild(percentile95Cell);
+
+        // Max Points
+        const maxPointsCell = document.createElement("td");
+        maxPointsCell.textContent = playerData.maxPoints;
+        row.appendChild(maxPointsCell);
+
+        // Mode
+        const modeCell = document.createElement("td");
+        modeCell.textContent = playerData.mode !== undefined ? playerData.mode.join(', ') : '...';
+        row.appendChild(modeCell);
+
+        tableBody.appendChild(row);
+    }
+
+}
+
+
 
 // Set default tab to Standings on initial load
 document.addEventListener('DOMContentLoaded', () => {
