@@ -1,8 +1,8 @@
-import { updateTeamData } from './computestats.js';
+import { updateTeamData, calculatePlayerData } from './computestats.js';
 
 let completedSimulations = 0;
 let teamData = [];
-const playerMap = new Map();
+let playerMap = new Map();
 const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
 const INITIAL_SIMULATIONS = 16384; // 2^16 simulations for initial quick results
 const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
@@ -10,11 +10,6 @@ const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-
-    //const NUM_SIMULATIONS = 65536; // 2^20 simulations for better accuracy
-
-
-    
     // Fetch and update team data with probabilities from ESPN
     teamData = await updateTeamData(teamData);
     // Update the "Last Updated" timestamp to match the ESPN data
@@ -38,83 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Calculate standings table
      */
 
-    // Helper function to initialize a player if they don't exist in the map
-    const initializePlayer = (player) => {
-    if (!playerMap.has(player)) {
-        playerMap.set(player, {
-        player: player,
-        expectedPoints: 0,
-        mostLikelyPoints: 0,
-        maxPoints: 0,
-        minPoints: 0,
-        simulatedWins: 0
-        });
-    }
-    };
-
-    // Iterate over each team to calculate points
-    teamData.forEach(team => {
-    const {
-        probability_playoffs,
-        most_likely_playoffs,
-        points_playoffs,
-        points_no_playoffs,
-        players_list_make_playoffs,
-        players_list_miss_playoffs
-    } = team;
-
-    // Process players who get points if the team makes the playoffs
-    if (players_list_make_playoffs) {
-        players_list_make_playoffs.forEach(player => {
-        initializePlayer(player);
-        const playerData = playerMap.get(player);
-
-        // Calculate expectedPoints
-        playerData.expectedPoints += points_playoffs * probability_playoffs;
-
-        // Calculate mostLikelyPoints
-        if (most_likely_playoffs === true) {
-            playerData.mostLikelyPoints += points_playoffs;
-        }
-
-        // Calculate maxPoints
-        if (probability_playoffs > 0) {
-            playerData.maxPoints += points_playoffs;
-        }
-        // Calculate minPoints
-        if (probability_playoffs == 1) {
-            playerData.minPoints += points_playoffs;
-        }
-        });
-    }
-
-    // Process players who get points if the team misses the playoffs
-    if (players_list_miss_playoffs) {
-        players_list_miss_playoffs.forEach(player => {
-        initializePlayer(player);
-        const playerData = playerMap.get(player);
-        const prob_miss_playoffs = 1 - probability_playoffs;
-
-        // Calculate expectedPoints
-        playerData.expectedPoints += points_no_playoffs * prob_miss_playoffs;
-
-        // Calculate mostLikelyPoints
-        if (most_likely_playoffs === false) {
-            playerData.mostLikelyPoints += points_no_playoffs;
-        }
-
-        // Calculate maxPoints
-        if (probability_playoffs < 1) {
-            playerData.maxPoints += points_no_playoffs;
-        }
-
-        // Calculate minPoints
-        if (probability_playoffs == 0) {
-            playerData.minPoints += points_no_playoffs;
-        }
-        });
-    }
-    });
+    // Create playerMap from teamData
+    playerMap = calculatePlayerData(teamData, playerMap);
 
     // Populate the standings and expanded standings tables with the calculated player data
     populateStandingsTable(playerMap);

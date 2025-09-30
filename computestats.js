@@ -1,3 +1,10 @@
+/**
+ * Fetches team data and probability data, merges them, and computes additional statistics.
+ * Returns the updated team data with probabilities and playoff likelihoods.
+ * 
+ * @returns {Promise<Array>} Updated team data with probabilities and playoff likelihoods.
+ */
+
 export async function updateTeamData(teamData) {
     let probabilityData = [];
     
@@ -125,6 +132,93 @@ export async function updateTeamData(teamData) {
     });
 
     return teamData;
+}
+
+/**
+ * Calculates the player data used in standings tables
+ */
+export function calculatePlayerData(teamData, playerMap) {
+    
+    // Helper function to initialize a player if they don't exist in the map
+    const initializePlayer = (player) => {
+    if (!playerMap.has(player)) {
+        playerMap.set(player, {
+        player: player,
+        expectedPoints: 0,
+        mostLikelyPoints: 0,
+        maxPoints: 0,
+        minPoints: 0,
+        simulatedWins: 0
+        });
+    }
+    };
+
+    // Iterate over each team to calculate points
+    teamData.forEach(team => {
+        const {
+            probability_playoffs,
+            most_likely_playoffs,
+            points_playoffs,
+            points_no_playoffs,
+            players_list_make_playoffs,
+            players_list_miss_playoffs
+        } = team;
+
+        // Process players who get points if the team makes the playoffs
+        if (players_list_make_playoffs) {
+            players_list_make_playoffs.forEach(player => {
+            initializePlayer(player);
+            const playerData = playerMap.get(player);
+
+            // Calculate expectedPoints
+            playerData.expectedPoints += points_playoffs * probability_playoffs;
+
+            // Calculate mostLikelyPoints
+            if (most_likely_playoffs === true) {
+                playerData.mostLikelyPoints += points_playoffs;
+            }
+
+            // Calculate maxPoints
+            if (probability_playoffs > 0) {
+                playerData.maxPoints += points_playoffs;
+            }
+            // Calculate minPoints
+            if (probability_playoffs == 1) {
+                playerData.minPoints += points_playoffs;
+            }
+            });
+        }
+
+        // Process players who get points if the team misses the playoffs
+        if (players_list_miss_playoffs) {
+            players_list_miss_playoffs.forEach(player => {
+            initializePlayer(player);
+            const playerData = playerMap.get(player);
+            const prob_miss_playoffs = 1 - probability_playoffs;
+
+            // Calculate expectedPoints
+            playerData.expectedPoints += points_no_playoffs * prob_miss_playoffs;
+
+            // Calculate mostLikelyPoints
+            if (most_likely_playoffs === false) {
+                playerData.mostLikelyPoints += points_no_playoffs;
+            }
+
+            // Calculate maxPoints
+            if (probability_playoffs < 1) {
+                playerData.maxPoints += points_no_playoffs;
+            }
+
+            // Calculate minPoints
+            if (probability_playoffs == 0) {
+                playerData.minPoints += points_no_playoffs;
+            }
+            });
+        }
+    });
+
+    return playerMap;
+
 }
 
 
