@@ -1,10 +1,10 @@
-import { updateTeamData, calculatePlayerData } from './computestats.js';
+import { updateTeamData, calculatePlayerData, runSimulations } from './computestats.js';
 
 let completedSimulations = 0;
 let teamData = [];
 let playerMap = new Map();
-const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
 const INITIAL_SIMULATIONS = 16384; // 2^16 simulations for initial quick results
+const PECENTILE_SIMULATIONS = 1048576; // 2^20 simulations for percentile calculations
 const SUFFICIENT_SIMULATIONS = 16777216; // 2^24 simulations for high precision
 
 
@@ -36,101 +36,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Create playerMap from teamData
     playerMap = calculatePlayerData(teamData, playerMap);
 
-    // Populate the standings and expanded standings tables with the calculated player data
-    populateStandingsTable(playerMap);
-    populateExpandedStandingsTable(playerMap);
-
-    // Populate the teams table with the updated team data
+    // Populate all the tables with initial data (0 simulations completed)
+    populateStandingsTable(playerMap, 0);
+    populateExpandedStandingsTable(playerMap, teamData.completedSimulations);
     populateTeamsTable(teamData);
+    makeStandingsTableRowsSelectable();
+    sortAllTables();
 
-    // Create a collection of Web Workers
-    const workers = [];
-    for (let i = 0; i < NUM_WORKERS; i++) {
-        const worker = new Worker('worker.js');
-        workers.push(worker);
-    }
-
-    // Iterate through the workers, send the same data, and assign the same listener
-    // One worker will also calculate percentiles
-    let needPercentilesCalculated = true;
-    workers.forEach(worker => {
-        // Send data to the worker
-        worker.postMessage({
-            teamData: teamData,
-            playerMap: playerMap,
-            numSimulations: INITIAL_SIMULATIONS, // Number of simulations
-            calculatePercentiles: needPercentilesCalculated
-        });
-        needPercentilesCalculated = false;
-        // Listen for messages from the worker
-        worker.onmessage = function(e) {
-            const simulationPlayerMap = e.data.playerMap;
-            completedSimulations += e.data.completedSimulations;
-
-            // Update the number of simulated wins for each player
-            simulationPlayerMap.forEach((data, player) => {
-                if (playerMap.has(player)) {
-                    playerMap.get(player).simulatedWins += data.simulatedWins;
-                    playerMap.get(player).winProbability = playerMap.get(player).simulatedWins / completedSimulations;
-                }
-            });
-
-
-            //Update win probabilities in the playerMap
-            playerMap.forEach(playerData => {
-                playerData.winProbability = playerData.simulatedWins / completedSimulations;
-            });
-            
-            
-            // Update the win probability column in Standings table after the simulation is complete
-            const standingsTableBody = document.querySelector("#standingsTable tbody");
-            Array.from(standingsTableBody.rows).forEach(row => {
-                const playerName = row.cells[0].textContent;
-                const playerData = playerMap.get(playerName);
-                const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
-                if (playerData) {
-                    row.cells[3].textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
-                }
-            });
-
-            //Write number of simulations to console
-            console.log(`Completed Simulations: ${completedSimulations}`);
-
-            //If this is a percentile calculation, update the playerMap with the percentiles and update the expanded standings table
-            if (e.data.percentilesCalculated) {
-                console.log("Percentiles calculated");
-                // Copy properties from e.data.playerMap for each player
-                simulationPlayerMap.forEach((data, player) => {
-                    if (playerMap.has(player)) {
-                        const playerData = playerMap.get(player);
-                        playerData.percentile_05 = data.percentile_05;
-                        playerData.percentile_25 = data.percentile_25;
-                        playerData.percentile_50 = data.percentile_50;
-                        playerData.percentile_75 = data.percentile_75;
-                        playerData.percentile_95 = data.percentile_95;
-                        playerData.simulatedMin = data.simulatedMin;
-                        playerData.simulatedMax = data.simulatedMax;
-                        playerData.mode = data.mode;
-                    }
-                });
-            }
-
-            // Update the Expanded Standings table after the simulation is complete
-            populateExpandedStandingsTable(playerMap);
-
-            // If we haven't reached sufficient simulations, send doulbe the amount of simulations to the worker
-            if (completedSimulations < SUFFICIENT_SIMULATIONS) {
-                const nextSimulations = Math.min(e.data.completedSimulations * 2, Math.ceil((SUFFICIENT_SIMULATIONS - completedSimulations)  / NUM_WORKERS));
-                worker.postMessage({
-                    teamData: teamData,
-                    playerMap: playerMap,
-                    numSimulations: nextSimulations,
-                    calculatePercentiles: false
-                });
-            }
-        };
+    // Run simulations to calculate win probabilities and update playerMap and teamData
+    runSimulations(teamData, playerMap, INITIAL_SIMULATIONS, false).then(({playerMap: updatedPlayerMap, teamData: updatedTeamData}) => {
+        teamData = updatedTeamData;
+        playerMap = updatedPlayerMap;
+        // Update the standings and expanded standings tables with the new player data
+        populateStandingsTable(updatedPlayerMap, 0);
+        populateExpandedStandingsTable(updatedPlayerMap, 0);
+        //sort the expanded standings table now that win probabilities are available
+        const expandedStandingsTable = document.getElementById('expandedStandingsTable');
+        const expandedStandingsHeader = expandedStandingsTable.querySelector('th[data-sort-dir]');
+        if (expandedStandingsHeader) {
+            const columnIndex = parseInt(expandedStandingsHeader.dataset.column, 10);
+            const direction = expandedStandingsHeader.dataset.sortDir;
+            sortTableByColumn(expandedStandingsTable, columnIndex, direction);
+        }
     });
+
+    // Run a long set of simulations to calculate percentiles and update playerMap and teamData
+    runSimulations(teamData, playerMap, SUFFICIENT_SIMULATIONS, true).then(({playerMap: updatedPlayerMap, teamData: updatedTeamData}) => {
+        teamData = updatedTeamData;
+        playerMap = updatedPlayerMap;
+        // Update the standings and expanded standings tables with the new player data
+        populateStandingsTable(updatedPlayerMap, 0);
+        populateExpandedStandingsTable(updatedPlayerMap, 0);
+        //sort the expanded standings table since the rows are regenrated on update
+        const expandedStandingsTable = document.getElementById('expandedStandingsTable');
+        const expandedStandingsHeader = expandedStandingsTable.querySelector('th[data-sort-dir]');
+        if (expandedStandingsHeader) {
+            const columnIndex = parseInt(expandedStandingsHeader.dataset.column, 10);
+            const direction = expandedStandingsHeader.dataset.sortDir;
+            sortTableByColumn(expandedStandingsTable, columnIndex, direction);
+        }
+    });
+
+
     
+   
     /**
      * Populates the teams table with the updated team data
      * @param {Array} allTeamData The full array of team data from the JSON file.
@@ -318,32 +267,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Initial default sort for all columns with default sort direction
-    document.querySelectorAll('th[data-sort-dir]').forEach(header => {
-        const parentTable = header.closest('table');
-        if (!parentTable) return;
-        const columnIndex = parseInt(header.dataset.column, 10);
-        const direction = header.dataset.sortDir;
-        sortTableByColumn(parentTable, columnIndex, direction);
-    });
+    function sortAllTables() {
+        document.querySelectorAll('th[data-sort-dir]').forEach(header => {
+            const parentTable = header.closest('table');
+            if (!parentTable) return;
+            const columnIndex = parseInt(header.dataset.column, 10);
+            const direction = header.dataset.sortDir;
+            sortTableByColumn(parentTable, columnIndex, direction);
+        });
+    }
 
     // Make all rows in all tables selectable and highlight on click
-    document.querySelectorAll('table').forEach(function(table) {
-        table.querySelectorAll('tbody tr').forEach(function(row) {
-            row.addEventListener('click', function() {
-                table.querySelectorAll('tbody tr').forEach(function(r) {
-                    r.classList.remove('selected-row');
-                });
-                row.classList.add('selected-row');
+    function makeStandingsTableRowsSelectable() {
+        document.querySelectorAll('#standingsTable').forEach(function(table) {
+            table.querySelectorAll('tbody tr').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    table.querySelectorAll('tbody tr').forEach(function(r) {
+                        r.classList.remove('selected-row');
+                    });
+                    row.classList.add('selected-row');
 
-                // If this is the standings table, populate the player picks table
-                if (table.id === 'standingsTable') {
-                    const playerName = row.querySelector('td').textContent;
-                    // Call the new function to populate the table using the fetched data
-                    populatePlayerPicks(playerName, teamData);
-                }
+                    // If this is the standings table, populate the player picks table
+                    if (table.id === 'standingsTable') {
+                        const playerName = row.querySelector('td').textContent;
+                        // Call the new function to populate the table using the fetched data
+                        populatePlayerPicks(playerName, teamData);
+                    }
+                });
             });
         });
-    });
+    }
+
 
 });
 
@@ -383,38 +337,38 @@ function openTab(evt, tabName) {
  * Populates the standings table with data from a Map.
  * @param {Map<string, Object>} playerMap - The map containing player data.
  */
-function populateStandingsTable(playerMap) {
-    // Get the table body element
+function populateStandingsTable(playerMap, precisionWinProbability) {
     const tableBody = document.querySelector("#standingsTable tbody");
-    // Clear any existing rows
-    tableBody.innerHTML = '';
-   // Loop through each player object in the map's values
+    
     for (const playerData of playerMap.values()) {
-        // Create a new table row
-        const row = document.createElement("tr");
-        // Create and append the Player cell
-        const playerCell = document.createElement("td");
-        playerCell.textContent = playerData.player;
-        row.appendChild(playerCell);
+        let row = Array.from(tableBody.children).find(r => r.cells[0].textContent === playerData.player);
 
-        // Create and append the Expected Points cell
-        const expectedPointsCell = document.createElement("td");
-        // Format to 2 decimal places for readability
-        expectedPointsCell.textContent = playerData.expectedPoints.toFixed(0);
-        row.appendChild(expectedPointsCell);
+        if (row) {
+            // Update existing row
+            const winProbabilityCell = row.cells[3];
+            winProbabilityCell.textContent = playerData.winProbability !== undefined ? (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ' : '...';
+        } else {
+            // Create new row
+            row = document.createElement("tr");
 
-        // Create and append the Most Likely Points cell
-        const mostLikelyPointsCell = document.createElement("td");
-        mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
-        row.appendChild(mostLikelyPointsCell);
+            const playerCell = document.createElement("td");
+            playerCell.textContent = playerData.player;
+            row.appendChild(playerCell);
 
-        // Create and append the Win PRobability cell with a placeholder
-        const winProbabilityCell = document.createElement("td");
-        winProbabilityCell.textContent = "...";
-        row.appendChild(winProbabilityCell);
+            const expectedPointsCell = document.createElement("td");
+            expectedPointsCell.textContent = playerData.expectedPoints.toFixed(0);
+            row.appendChild(expectedPointsCell);
 
-        // Append the completed row to the table body
-        tableBody.appendChild(row);
+            const mostLikelyPointsCell = document.createElement("td");
+            mostLikelyPointsCell.textContent = playerData.mostLikelyPoints;
+            row.appendChild(mostLikelyPointsCell);
+
+            const winProbabilityCell = document.createElement("td");
+            winProbabilityCell.textContent = playerData.winProbability !== undefined ? (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ' : '...';
+            row.appendChild(winProbabilityCell);
+
+            tableBody.appendChild(row);
+        }
     }
 }
 
@@ -422,7 +376,7 @@ function populateStandingsTable(playerMap) {
  * Populates the expanded standings table with data from a Map.
  * @param {Map<string, Object>} playerMap - The map containing player data.
  */
-function populateExpandedStandingsTable(playerMap) {
+function populateExpandedStandingsTable(playerMap, precisionWinProbability) {
     const tableBody = document.querySelector("#expandedStandingsTable tbody");
     tableBody.innerHTML = ''; // Clear any existing rows
     for (const playerData of playerMap.values()) {
@@ -436,8 +390,7 @@ function populateExpandedStandingsTable(playerMap) {
 
         // Win Probability
         const winProbabilityCell = document.createElement("td");
-        const precisionWinProbability = completedSimulations < SUFFICIENT_SIMULATIONS ? 0 : 1;
-        winProbabilityCell.textContent = (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ';
+        winProbabilityCell.textContent = playerData.winProbability !== undefined ? (playerData.winProbability * 100).toFixed(precisionWinProbability) + '% ' : '...';
         row.appendChild(winProbabilityCell);
 
         // Min Points

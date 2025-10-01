@@ -25,7 +25,7 @@
       "PM",
       "WM"
     ],
-    "players_list_miss_playoffs": ["IP"],
+    "players_list_miss_playoffs": null,
     "division": "AFC North"
   },
   {
@@ -63,8 +63,7 @@
     "players_list_make_playoffs": [
       "BW",
       "BS",
-      "KK",
-      "IP"
+      "KK"
     ],
     "players_list_miss_playoffs": [
       "MG",
@@ -110,7 +109,7 @@
     "Team": "Los Angeles Rams",
     "points_playoffs": 175,
     "points_no_playoffs": 233,
-    "players_list_make_playoffs": ["IP"],
+    "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "AK",
       "CL",
@@ -142,8 +141,7 @@
       "WM"
     ],
     "players_list_miss_playoffs": [
-      "AK",
-      "IP"
+      "AK"
     ],
     "division": "NFC North"
   },
@@ -156,7 +154,7 @@
       "PM",
       "WM"
     ],
-    "players_list_miss_playoffs": ["IP"],
+    "players_list_miss_playoffs": null,
     "division": "AFC West"
   },
   {
@@ -211,8 +209,7 @@
     "points_playoffs": 242,
     "points_no_playoffs": 170,
     "players_list_make_playoffs": [
-      "AK",
-      "IP"
+      "AK"
     ],
     "players_list_miss_playoffs": [
       "CL",
@@ -229,8 +226,7 @@
       "PM"
     ],
     "players_list_miss_playoffs": [
-      "AK",
-      "IP"
+      "AK"
     ],
     "division": "NFC South"
   },
@@ -241,8 +237,7 @@
     "players_list_make_playoffs": [
       "AK",
       "CL",
-      "KK",
-      "IP"
+      "KK"
     ],
     "players_list_miss_playoffs": [
       "PM"
@@ -257,8 +252,7 @@
       "PM"
     ],
     "players_list_miss_playoffs": [
-      "AK",
-      "IP"
+      "AK"
     ],
     "division": "NFC West"
   },
@@ -266,7 +260,7 @@
     "Team": "Jacksonville Jaguars",
     "points_playoffs": 292,
     "points_no_playoffs": 152,
-    "players_list_make_playoffs": ["IP"],
+    "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "BS",
       "MG",
@@ -279,7 +273,7 @@
     "Team": "Chicago Bears",
     "points_playoffs": 305,
     "points_no_playoffs": 149,
-    "players_list_make_playoffs": ["IP"],
+    "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "AK",
       "PM"
@@ -290,7 +284,7 @@
     "Team": "Dallas Cowboys",
     "points_playoffs": 309,
     "points_no_playoffs": 148,
-    "players_list_make_playoffs": ["IP"],
+    "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "BW",
       "BS",
@@ -305,8 +299,7 @@
     "points_playoffs": 322,
     "points_no_playoffs": 145,
     "players_list_make_playoffs": [
-      "CL",
-      "IP"
+      "CL"
     ],
     "players_list_miss_playoffs": [
       "AK",
@@ -322,7 +315,7 @@
     "Team": "Miami Dolphins",
     "points_playoffs": 347,
     "points_no_playoffs": 140,
-    "players_list_make_playoffs": ["IP"],
+    "players_list_make_playoffs": null,
     "players_list_miss_playoffs": [
       "AK",
       "BW",
@@ -372,8 +365,7 @@
       "BW",
       "BS",
       "CL",
-      "KK",
-      "IP"
+      "KK"
     ],
     "division": "AFC South"
   },
@@ -403,8 +395,7 @@
     "players_list_miss_playoffs": [
       "BW",
       "BS",
-      "KK",
-      "IP"
+      "KK"
     ],
     "division": "NFC East"
   },

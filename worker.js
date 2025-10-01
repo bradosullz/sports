@@ -12,13 +12,8 @@ onmessage = async function(e) {
         playerPointsHistory.set(player, []);
     }
 
-    // If calculatePercentiles is true, override numSimulations to 1,000,000
-    let localNumSimulations = numSimulations;
-    if (calculatePercentiles) {
-        localNumSimulations = 1000000;
-    }
-
     // Run numSimulations simulations
+    let localNumSimulations = numSimulations;
     for (let sim = 0; sim < localNumSimulations; sim++) {
          
         // Track which teams make playoffs in this simulation

@@ -221,5 +221,85 @@ export function calculatePlayerData(teamData, playerMap) {
 
 }
 
+/** Runs simulations for win probabilities and percentiles */
+export async function runSimulations(teamData, playerMap, simulationCount, calculatePercentiles) {
+    //Use all the threads but leave one free for the UI
+    const NUM_WORKERS = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 1;
+    
+    //If teamData.completedSimulations does not exist, set it to 0
+    if (!teamData.completedSimulations) {
+        teamData.completedSimulations = 0;
+    }
+    
+    // Create a collection of Web Workers
+    const workers = [];
+    const workerPromises = []; // Array to hold promises for each worker
+
+    for (let i = 0; i < NUM_WORKERS; i++) {
+        const worker = new Worker('worker.js');
+        workers.push(worker);
+
+        // Create a promise for each worker
+        workerPromises.push(new Promise(resolve => {
+            worker.onmessage = function(e) {
+                const simulationPlayerMap = e.data.playerMap;
+                teamData.completedSimulations += e.data.completedSimulations;
+
+                // Update the number of simulated wins for each player
+                simulationPlayerMap.forEach((data, player) => {
+                    if (playerMap.has(player)) {
+                        playerMap.get(player).simulatedWins += data.simulatedWins;
+                        playerMap.get(player).winProbability = playerMap.get(player).simulatedWins / teamData.completedSimulations;
+                    }
+                });
+                          
+
+                //Write number of simulations to console
+                console.log(`Completed Simulations: ${teamData.completedSimulations}`);
+
+                //If this is a percentile calculation, update the playerMap with the percentiles and update the expanded standings table
+                if (e.data.percentilesCalculated) {
+                    console.log("Percentiles calculated");
+                    // Copy properties from e.data.playerMap for each player
+                    simulationPlayerMap.forEach((data, player) => {
+                        if (playerMap.has(player)) {
+                            const playerData = playerMap.get(player);
+                            playerData.percentile_05 = data.percentile_05;
+                            playerData.percentile_25 = data.percentile_25;
+                            playerData.percentile_50 = data.percentile_50;
+                            playerData.percentile_75 = data.percentile_75;
+                            playerData.percentile_95 = data.percentile_95;
+                            playerData.simulatedMin = data.simulatedMin;
+                            playerData.simulatedMax = data.simulatedMax;
+                            playerData.mode = data.mode;
+                        }
+                    });
+                }
+                resolve(); // Resolve the promise when the worker sends its message
+            };
+        }));
+    }
+
+    // Post messages to all workers
+    let needPercentilesCalculated = calculatePercentiles;
+    workers.forEach(worker => {
+        worker.postMessage({
+            teamData: teamData,
+            playerMap: playerMap,
+            numSimulations: Math.ceil(simulationCount / NUM_WORKERS), // Number of simulations
+            calculatePercentiles: needPercentilesCalculated
+        });
+        needPercentilesCalculated = false;
+    });
+
+    // Wait for all workers to finish
+    await Promise.all(workerPromises);
+
+    // Terminate all workers
+    workers.forEach(worker => worker.terminate());
+
+    return {playerMap, teamData}; // Return the updated playerMap
+}
+
 
 
