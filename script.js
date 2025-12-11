@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         teamData = updatedTeamData;
         playerMap = updatedPlayerMap;
         // Update the standings and expanded standings tables with the new player data
-        populateStandingsTable(updatedPlayerMap, 10);
+        populateStandingsTable(updatedPlayerMap, 1);
         populateExpandedStandingsTable(updatedPlayerMap, 1);
         //sort the expanded standings table since the rows are regenrated on update
         const expandedStandingsTable = document.getElementById('expandedStandingsTable');
@@ -135,6 +135,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const populatePlayerPicks = (playerName, allTeamData) => {
         const playerTableMakes = document.getElementById('selectedPlayerTableMakes');
         const playerTableMisses = document.getElementById('selectedPlayerTableMisses');
+        const playerPlayoffTeamsTable = document.getElementById('selectedPlayerPlayoffTeams');
+        const playerPlayoffTeamsCaption = document.getElementById('selectedPlayerPlayoffTeamsCaption');
         const tableBodyMakes = playerTableMakes.querySelector('tbody');
         const tableBodyMisses = playerTableMisses.querySelector('tbody');
         const playerNameHeaderMakes = document.getElementById('selectedPlayerNameMakes');
@@ -202,13 +204,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             cellProbability.textContent = `${probabilityPercent}%`;
         });
 
-        // Make the table visible
+        // Make the player tables visible
         playerTableMakes.style.display = 'table';
         playerTableMisses.style.display = 'table';
 
         // Sort the tables by Expected Points in descending order
         sortTableByColumn(playerTableMakes, 1, 'desc');
         sortTableByColumn(playerTableMisses, 1, 'desc');
+
+        // Populate the new selected player playoff teams table
+        const playoffBody = playerPlayoffTeamsTable.querySelector('tbody');
+        playoffBody.innerHTML = '';
+        playerPlayoffTeamsCaption.textContent = `${playerName}'s Easiest Path to Victory`;
+
+        const selectedPlayerData = playerMap.get(playerName);
+        const mostCommonTeams = selectedPlayerData?.mostCommonPlayoffTeams || [];
+        if (mostCommonTeams.length === 0) {
+            const row = playoffBody.insertRow();
+            const cell = row.insertCell();
+            cell.textContent = 'No data';
+        } else {
+            mostCommonTeams.forEach(team => {
+                const row = playoffBody.insertRow();
+                const cell = row.insertCell();
+                cell.textContent = team;
+            });
+        }
+        playerPlayoffTeamsTable.style.display = 'table';
     };
 
     /**
@@ -324,6 +346,7 @@ function openTab(evt, tabName) {
         if (selectedRow) {
             document.getElementById('selectedPlayerTableMakes').style.display = "table";
             document.getElementById('selectedPlayerTableMisses').style.display = "table";
+            document.getElementById('selectedPlayerPlayoffTeams').style.display = "table";
         }
     } else if (tabName === 'Expanded Standings') {
         document.getElementById('expandedStandingsTable').style.display = "table";

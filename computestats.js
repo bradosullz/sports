@@ -245,11 +245,29 @@ export async function runSimulations(teamData, playerMap, simulationCount, calcu
                 const simulationPlayerMap = e.data.playerMap;
                 teamData.completedSimulations += e.data.completedSimulations;
 
-                // Update the number of simulated wins for each player
+                // Update the number of simulated wins and copy other computed properties for each player
                 simulationPlayerMap.forEach((data, player) => {
                     if (playerMap.has(player)) {
-                        playerMap.get(player).simulatedWins += data.simulatedWins;
-                        playerMap.get(player).winProbability = playerMap.get(player).simulatedWins / teamData.completedSimulations;
+                        const playerData = playerMap.get(player);
+                        // Simulated wins and win probability
+                        playerData.simulatedWins += data.simulatedWins;
+                        playerData.winProbability = playerData.simulatedWins / teamData.completedSimulations;
+
+                        // Copy percentile / mode fields if present (these are updated only during percentile runs)
+                        if (data.percentile_05 !== undefined) playerData.percentile_05 = data.percentile_05;
+                        if (data.percentile_25 !== undefined) playerData.percentile_25 = data.percentile_25;
+                        if (data.percentile_50 !== undefined) playerData.percentile_50 = data.percentile_50;
+                        if (data.percentile_75 !== undefined) playerData.percentile_75 = data.percentile_75;
+                        if (data.percentile_95 !== undefined) playerData.percentile_95 = data.percentile_95;
+                        if (data.simulatedMin !== undefined) playerData.simulatedMin = data.simulatedMin;
+                        if (data.simulatedMax !== undefined) playerData.simulatedMax = data.simulatedMax;
+                        if (data.mode !== undefined) playerData.mode = data.mode;
+
+                        // Copy the most common playoffTeams list and wins if present
+                        if (data.mostCommonPlayoffTeams !== undefined) {
+                            playerData.mostCommonPlayoffTeams = data.mostCommonPlayoffTeams;
+                            playerData.mostCommonPlayoffTeamsWins = data.mostCommonPlayoffTeamsWins || 0;
+                        }
                     }
                 });
                           
@@ -260,20 +278,7 @@ export async function runSimulations(teamData, playerMap, simulationCount, calcu
                 //If this is a percentile calculation, update the playerMap with the percentiles and update the expanded standings table
                 if (e.data.percentilesCalculated) {
                     console.log("Percentiles calculated");
-                    // Copy properties from e.data.playerMap for each player
-                    simulationPlayerMap.forEach((data, player) => {
-                        if (playerMap.has(player)) {
-                            const playerData = playerMap.get(player);
-                            playerData.percentile_05 = data.percentile_05;
-                            playerData.percentile_25 = data.percentile_25;
-                            playerData.percentile_50 = data.percentile_50;
-                            playerData.percentile_75 = data.percentile_75;
-                            playerData.percentile_95 = data.percentile_95;
-                            playerData.simulatedMin = data.simulatedMin;
-                            playerData.simulatedMax = data.simulatedMax;
-                            playerData.mode = data.mode;
-                        }
-                    });
+                    // (Fields already copied above) -- since we now copy percentiles and mode above
                 }
                 resolve(); // Resolve the promise when the worker sends its message
             };

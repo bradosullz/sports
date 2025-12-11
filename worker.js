@@ -12,6 +12,13 @@ onmessage = async function(e) {
         playerPointsHistory.set(player, []);
     }
 
+    // Initialize a Map to track wins per unique playoffTeams list for each player
+    // Structure: playerPlayoffWins: Map<string(player), Map<string(playoffKey), number(wins)>>
+    const playerPlayoffWins = new Map();
+    for (const player of playerMap.keys()) {
+        playerPlayoffWins.set(player, new Map());
+    }
+
     // Run numSimulations simulations
     let localNumSimulations = numSimulations;
     for (let sim = 0; sim < localNumSimulations; sim++) {
@@ -91,6 +98,17 @@ onmessage = async function(e) {
             playerMap.get(winner).simulatedWins += simulatedWinsPerPlayer;
         });
 
+        // Also track this exact set of playoff teams for each winner
+        // Normalize playoffTeams to a deterministic array of team names for keying
+        const playoffTeamsArray = Array.from(playoffTeams).map(team => team.Team).sort();
+        const playoffKey = JSON.stringify(playoffTeamsArray);
+
+        winners.forEach(winner => {
+            const perPlayerWinsMap = playerPlayoffWins.get(winner);
+            const prev = perPlayerWinsMap.get(playoffKey) || 0;
+            perPlayerWinsMap.set(playoffKey, prev + simulatedWinsPerPlayer);
+        });
+
         // Store points for this simulation if CalculatePercentiles is true
         if (calculatePercentiles) {
         
@@ -138,6 +156,33 @@ onmessage = async function(e) {
                 }
             }
             playerData.mode = mode;
+        }
+    }
+
+    // After all simulations, compute the most common playoffTeams list per player
+    for (const [player, playoffWinsMap] of playerPlayoffWins.entries()) {
+        let maxWins = -1;
+        let maxKey = null;
+        for (const [key, wins] of playoffWinsMap.entries()) {
+            if (wins > maxWins) {
+                maxWins = wins;
+                maxKey = key;
+            }
+        }
+
+        const playerData = playerMap.get(player);
+        if (maxKey !== null) {
+            try {
+                playerData.mostCommonPlayoffTeams = JSON.parse(maxKey);
+            } catch (err) {
+                // Fallback: split key or store as string
+                playerData.mostCommonPlayoffTeams = maxKey.split(',');
+            }
+            // Optionally, store the fractional wins for this specific list
+            playerData.mostCommonPlayoffTeamsWins = maxWins;
+        } else {
+            playerData.mostCommonPlayoffTeams = [];
+            playerData.mostCommonPlayoffTeamsWins = 0;
         }
     }
 
