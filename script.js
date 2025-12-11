@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         teamData = updatedTeamData;
         playerMap = updatedPlayerMap;
         // Update the standings and expanded standings tables with the new player data
-        populateStandingsTable(updatedPlayerMap, 1);
+        populateStandingsTable(updatedPlayerMap, 10);
         populateExpandedStandingsTable(updatedPlayerMap, 1);
         //sort the expanded standings table since the rows are regenrated on update
         const expandedStandingsTable = document.getElementById('expandedStandingsTable');
